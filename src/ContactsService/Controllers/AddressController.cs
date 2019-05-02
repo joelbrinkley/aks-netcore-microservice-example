@@ -6,6 +6,11 @@ namespace ContactsService.Controllers
     [Route("api/addresses")]
     public class AddressController : Controller
     {
+        public AddressController()
+        {
+            
+        }
+
         public async Task<IActionResult> NewContact()
         {
             return Ok();
