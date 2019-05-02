@@ -28,4 +28,5 @@ variable "client_secret" {
 variable "failover_location" {
     type = "string",
     default = "eastus"
+    description = "The fail over location for cosmos db"
 }
