@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using ContactsService.Models;
 using Microsoft.Azure.Cosmos;
 
-namespace ContactsService.Infrastructure.DocumentDb
+namespace ContactsService.Repository
 {
-    public class ContactsRepository
+    public class ContactsRepository : IContactRepository
     {
         public const string PartitionKey = "/contactid";
 

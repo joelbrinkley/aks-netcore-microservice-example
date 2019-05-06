@@ -1,15 +1,15 @@
 using System.Threading.Tasks;
 using ContactsService.Exceptions;
-using ContactsService.Infrastructure.DocumentDb;
 using ContactsService.Models;
+using ContactsService.Repository;
 
 namespace ContactsService.Features
 {
     public class RemoveContactCommandHandler
     {
-        private readonly ContactsRepository contactsRepository;
+        private readonly IContactRepository contactsRepository;
 
-        public RemoveContactCommandHandler(ContactsRepository contactsRepository)
+        public RemoveContactCommandHandler(IContactRepository contactsRepository)
         {
             this.contactsRepository = contactsRepository;
         }

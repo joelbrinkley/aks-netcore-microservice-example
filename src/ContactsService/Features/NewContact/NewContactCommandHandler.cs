@@ -1,15 +1,15 @@
 using System.Threading.Tasks;
 using ContactsService.Exceptions;
-using ContactsService.Infrastructure.DocumentDb;
 using ContactsService.Models;
+using ContactsService.Repository;
 
 namespace ContactsService.Features
 {
     public class NewContactCommandHandler
     {
-        private readonly ContactsRepository contactsRepository;
+        private readonly IContactRepository contactsRepository;
 
-        public NewContactCommandHandler(ContactsRepository contactsRepository)
+        public NewContactCommandHandler(IContactRepository contactsRepository)
         {
             this.contactsRepository = contactsRepository;
         }

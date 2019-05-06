@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
+using ContactsService.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -27,6 +28,7 @@ namespace ContactsService
             CosmosContainer contacts = db.Containers.CreateContainerIfNotExistsAsync("Contacts", "/contactid", 400).GetAwaiter().GetResult();
             
             services.AddSingleton(contacts);
+            services.AddScoped<IContactRepository, ContactsRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
