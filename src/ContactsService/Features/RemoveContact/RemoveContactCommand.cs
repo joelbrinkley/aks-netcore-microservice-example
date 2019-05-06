@@ -1,13 +1,13 @@
 using System;
 
-namespace ContactsService.Commands
+namespace ContactsService.Features
 {
     public class RemoveContactCommand
     {
-        public Guid ContactId { get; }
+        public string ContactId { get; }
         public DateTime CreatedOn { get; }
 
-        public RemoveContactCommand(Guid contactId)
+        public RemoveContactCommand(string contactId)
         {
             this.ContactId = contactId;
             this.CreatedOn = DateTime.UtcNow;

@@ -1,6 +1,6 @@
 using System;
 
-namespace ContactsService.Commands
+namespace ContactsService.Features
 {
     public class NewContactCommand
     {

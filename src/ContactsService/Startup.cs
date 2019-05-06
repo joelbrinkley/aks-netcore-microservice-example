@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ContactsService
@@ -19,13 +18,20 @@ namespace ContactsService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+            var comsosDbConnectionString = ConfigurationManager.ConnectionStrings["CosmosConnection"]?.ToString();
+            if(string.IsNullOrEmpty(comsosDbConnectionString)) throw new ConfigurationErrorsException("CosmosConnection is missing.");
+
+            var client = new CosmosClient(comsosDbConnectionString);
+            CosmosDatabase db = client.Databases.CreateDatabaseIfNotExistsAsync("Contacts").GetAwaiter().GetResult();
+            CosmosContainer contacts = db.Containers.CreateContainerIfNotExistsAsync("Contacts", "/contactid", 400).GetAwaiter().GetResult();
+            
+            services.AddSingleton(contacts);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            CreateDatabaseAndCollection().Wait();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -39,15 +45,5 @@ namespace ContactsService
             });
         }
 
-        private async Task CreateDatabaseAndCollection()
-        {
-            var client = new DocumentClient(new Uri(ConfigurationManager.AppSettings["accountEndpoint"]), ConfigurationManager.AppSettings["accountKey"]);
-
-            await client.CreateDatabaseIfNotExistsAsync(new Database { Id = "Contacts" });
-
-            await client.CreateDocumentCollectionIfNotExistsAsync(UriFactory.CreateDatabaseUri("Contacts"), new DocumentCollection { Id = "Contacts" });
-
-            Console.WriteLine("Database and collection validation complete");
-        }
     }
 }

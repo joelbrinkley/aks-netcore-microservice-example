@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using ContactsService.Features;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContactsService.Controllers
@@ -6,19 +7,26 @@ namespace ContactsService.Controllers
     [Route("api/addresses")]
     public class AddressController : Controller
     {
-        public AddressController()
+        private readonly NewContactCommandHandler newContactHandler;
+        private readonly RemoveContactCommandHandler removeContactHandler;
+
+        public AddressController(NewContactCommandHandler newContactHandler,
+                                 RemoveContactCommandHandler removeContactHandler)
         {
-            
+            this.newContactHandler = newContactHandler;
+            this.removeContactHandler = removeContactHandler;
         }
 
-        public async Task<IActionResult> NewContact()
+        public async Task<IActionResult> NewContact(NewContactCommand command)
         {
-            return Ok();
+            var result = await this.newContactHandler.Handle(command);
+            return Ok(result);
         }
 
-        public async Task<IActionResult> RemoveContact()
+        public async Task<IActionResult> RemoveContact(RemoveContactCommand command)
         {
-            return Ok();
+            await this.removeContactHandler.Handle(command);
+            return NoContent();
         }
     }
 }
