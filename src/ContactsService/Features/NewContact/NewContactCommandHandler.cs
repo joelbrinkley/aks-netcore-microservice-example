@@ -14,11 +14,13 @@ namespace ContactsService.Features
             this.contactsRepository = contactsRepository;
         }
 
+
+        /// Handler is idempotent. Could be called multiple times due to try logic
         public async Task<Contact> Handle(NewContactCommand command)
         {
             var existingContact = await contactsRepository.FindAsync(command.EmailAddress);
 
-            if (existingContact != null) throw new ContactAlreadyExistsException(command.EmailAddress);
+            if (existingContact != null) return existingContact;
 
             var contact = Contact.Create(command.FirstName, command.LastName, command.EmailAddress);
 

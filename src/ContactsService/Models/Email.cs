@@ -23,7 +23,6 @@ namespace ContactsService.Models
             return Value;
         }
 
-
         public static bool IsValid(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
