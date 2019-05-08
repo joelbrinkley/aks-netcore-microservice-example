@@ -14,8 +14,8 @@ resource "azurerm_resource_group" "main" {
 
 resource "azurerm_kubernetes_cluster" "main" {
   name                = "${var.prefix}-aks"
-  location            = "${azurerm_resource_group.aks.location}"
-  resource_group_name = "${azurerm_resource_group.aks.name}"
+  location            = "${azurerm_resource_group.main.location}"
+  resource_group_name = "${azurerm_resource_group.main.name}"
   dns_prefix          = "${var.dns_prefix}"
 
   agent_pool_profile {
@@ -35,7 +35,7 @@ resource "azurerm_kubernetes_cluster" "main" {
 } 
 
 resource "azurerm_servicebus_namespace" "main" {
-  name                = "${var.prefix}-sb"
+  name                = "${var.prefix}sb"
   location            = "${azurerm_resource_group.main.location}"
   resource_group_name = "${azurerm_resource_group.main.name}"
   sku                 = "Standard"
@@ -77,7 +77,7 @@ resource "azurerm_cosmosdb_account" "main" {
   }
 
   geo_location {
-    prefix            = "${var.prefix}-cosmos-db-${random_integer.ri.result}-customid"
+    prefix            = "${var.prefix}-cosmos-db-${random_integer.main.result}-customid"
     location          = "${azurerm_resource_group.main.location}"
     failover_priority = 0
   }

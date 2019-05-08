@@ -3,7 +3,7 @@ using ContactsService.Exceptions;
 using ContactsService.Models;
 using ContactsService.Repository;
 
-namespace ContactsService.Features
+namespace ContactsService.Commands
 {
     public class NewContactCommandHandler
     {
@@ -13,7 +13,6 @@ namespace ContactsService.Features
         {
             this.contactsRepository = contactsRepository;
         }
-
 
         /// Handler is idempotent. Could be called multiple times due to try logic
         public async Task<Contact> Handle(NewContactCommand command)

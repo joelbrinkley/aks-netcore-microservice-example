@@ -12,25 +12,14 @@
             "problemMatcher": "$tsc"
         },
         {
-            "label": "publish",
+            "label": "build-contactsservice",
             "command": "dotnet",
             "type": "process",
             "args": [
-                "publish",
-                "${workspaceFolder}/src/NotifierService/NotifierService.csproj"
+                "build",
+                "${workspaceFolder}/src/ContactsService/ContactsService.csproj"
             ],
             "problemMatcher": "$tsc"
-        },
-        {
-            "label": "watch",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "watch",
-                "run",
-                "${workspaceFolder}/src/NotifierService/NotifierService.csproj"
-            ],
-            "problemMatcher": "$tsc"
-        }
+        }      
     ]
 }

@@ -3,7 +3,7 @@ using ContactsService.Exceptions;
 using ContactsService.Models;
 using ContactsService.Repository;
 
-namespace ContactsService.Features
+namespace ContactsService.Commands
 {
     public class RemoveContactCommandHandler
     {

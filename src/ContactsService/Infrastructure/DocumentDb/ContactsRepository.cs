@@ -7,8 +7,6 @@ namespace ContactsService.Repository
 {
     public class ContactsRepository : IContactRepository
     {
-        public const string PartitionKey = "/contactid";
-
         private readonly CosmosContainer container;
 
         public ContactsRepository(CosmosContainer container)
@@ -18,18 +16,18 @@ namespace ContactsService.Repository
 
         public async Task<Contact> Add(Contact contact)
         {
-            var response = await this.container.Items.CreateItemAsync<Contact>(PartitionKey, contact);
-            var newContact = await this.container.Items.ReadItemAsync<Contact>(PartitionKey, contact.Id);
+            var response = await this.container.Items.CreateItemAsync<Contact>(contact.EmailAddress.ToString(), contact);
+            var newContact = await this.container.Items.ReadItemAsync<Contact>(contact.EmailAddress.ToString(), contact.EmailAddress.ToString());
             return newContact;
         }
         public async Task Remove(Contact contact)
         {
-            await this.container.Items.DeleteItemAsync<Contact>(PartitionKey, contact.Id);
+            await this.container.Items.DeleteItemAsync<Contact>(contact.EmailAddress.ToString(), contact.EmailAddress.ToString());
         }
 
-        public async Task<Contact> FindAsync(string id)
+        public async Task<Contact> FindAsync(string emailAddress)
         {
-            var contact = await this.container.Items.ReadItemAsync<Contact>(PartitionKey, id);
+            var contact = await this.container.Items.ReadItemAsync<Contact>(emailAddress, emailAddress);
             return contact;
         }
     }
