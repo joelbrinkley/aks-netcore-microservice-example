@@ -29,8 +29,8 @@ namespace ContactsService
         {
             services.AddMvc();
 
-            var comsosDbConnectionString = this.Configuration["ConnectionStrings:CosmosConnection"]?.ToString();
-            if (string.IsNullOrEmpty(comsosDbConnectionString)) throw new ConfigurationErrorsException("CosmosConnection is missing.");
+            var comsosDbConnectionString = this.Configuration["CosmosdbConnection"]?.ToString();
+            if (string.IsNullOrEmpty(comsosDbConnectionString)) throw new ConfigurationErrorsException("CosmosdbConnection is missing.");
 
             var client = new CosmosClient(comsosDbConnectionString);
             CosmosDatabase db = client.Databases.CreateDatabaseIfNotExistsAsync("Contacts").GetAwaiter().GetResult();

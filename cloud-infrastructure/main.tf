@@ -1,15 +1,46 @@
 locals {
-    tags = {
-        owner = "Joel Brinkley"
-        creator = "Joel Brinkley"
-        source = "Terraform"
-        app = "notificationapp"
-    }
+  tags = {
+    owner   = "Joel Brinkley"
+    creator = "Joel Brinkley"
+    source  = "Terraform"
+    app     = "notificationapp"
+  }
+}
+
+provider "azurerm" {
+  version = "=1.27.0"
+}
+
+provider "azuread" {
+  version = "0.3"
+}
+
+provider "random" {
+  version = "2.1"
 }
 
 resource "azurerm_resource_group" "main" {
   name     = "${var.prefix}-resources"
   location = "${var.location}"
+}
+
+resource "azuread_application" "main" {
+  name                       = "${var.prefix}"
+  homepage                   = "https://homepage"
+  identifier_uris            = ["https://uri"]
+  reply_urls                 = ["https://replyurl"]
+  available_to_other_tenants = false
+  oauth2_allow_implicit_flow = false
+}
+
+resource "azuread_service_principal" "main" {
+  application_id = "${azuread_application.main.application_id}"
+}
+
+resource "azuread_service_principal_password" "main" {
+  service_principal_id = "${azuread_service_principal.main.id}"
+  value                = "${var.service_principal_pw}"
+  end_date             = "2021-01-01T01:02:03Z"
 }
 
 resource "azurerm_kubernetes_cluster" "main" {
@@ -32,7 +63,7 @@ resource "azurerm_kubernetes_cluster" "main" {
   }
 
   tags = "${local.tags}"
-} 
+}
 
 resource "azurerm_servicebus_namespace" "main" {
   name                = "${var.prefix}sb"
@@ -84,9 +115,90 @@ resource "azurerm_cosmosdb_account" "main" {
 }
 
 resource "azurerm_container_registry" "main" {
-  name                     = "acr${random_integer.main.result}"
-  resource_group_name      = "${azurerm_resource_group.main.name}"
-  location                 = "${azurerm_resource_group.main.location}"
-  sku                      = "Basic"
-  admin_enabled            = false
+  name                = "acr${random_integer.main.result}"
+  resource_group_name = "${azurerm_resource_group.main.name}"
+  location            = "${azurerm_resource_group.main.location}"
+  sku                 = "Basic"
+  admin_enabled       = false
+}
+
+resource "azurerm_key_vault" "main" {
+  name                        = "${var.prefix}-akv"
+  location                    = "${azurerm_resource_group.main.location}"
+  resource_group_name         = "${azurerm_resource_group.main.name}"
+  enabled_for_disk_encryption = false
+  tenant_id                   = "${var.tenant_id}"
+
+  sku {
+    name = "standard"
+  }
+
+  network_acls {
+    default_action = "Allow"
+    bypass         = "None"
+  }
+
+  access_policy {
+    tenant_id = "${var.tenant_id}"
+    object_id = "${azuread_service_principal.main.id}"
+
+    key_permissions = [
+      "get",
+    ]
+
+    secret_permissions = [
+      "get",
+    ]
+
+    storage_permissions = [
+      "get",
+    ]
+  }
+
+  access_policy {
+    tenant_id = "${var.tenant_id}"
+    object_id = "${var.key_vault_admin}"
+
+    key_permissions = [
+      "get",
+      "list",
+      "update",
+      "create",
+      "import",
+      "delete",
+      "recover",
+      "backup",
+      "restore"
+    ]
+
+    secret_permissions = [
+      "get",
+      "list",
+      "delete",
+      "recover",
+      "backup",
+      "restore",
+      "set"
+    ]
+
+    storage_permissions = [
+      "get",
+      "set",
+      "list",
+      "update",
+      "delete",
+      "recover",
+      "backup",
+      "restore"
+    ]
+  }
+
+  tags = "${local.tags}"
+}
+resource "azurerm_key_vault_secret" "main" {
+  name         = "CosmosdbConnection"
+  value        = "AccountEndpoint=${azurerm_cosmosdb_account.main.endpoint};AccountKey=${azurerm_cosmosdb_account.main.primary_master_key};"
+  key_vault_id = "${azurerm_key_vault.main.id}"
+
+  tags = "${local.tags}"
 }
