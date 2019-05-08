@@ -82,3 +82,11 @@ resource "azurerm_cosmosdb_account" "main" {
     failover_priority = 0
   }
 }
+
+resource "azurerm_container_registry" "main" {
+  name                     = "acr${random_integer.main.result}"
+  resource_group_name      = "${azurerm_resource_group.main.name}"
+  location                 = "${azurerm_resource_group.main.location}"
+  sku                      = "Basic"
+  admin_enabled            = false
+}
