@@ -27,11 +27,6 @@ namespace FrontEnd
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //Add retry policy
-            /*   services.AddHttpClient<ContactsService>()
-                  .SetHandlerLifetime(TimeSpan.FromMinutes(5))  //Set lifetime to five minutes
-                  .AddPolicyHandler(RetryPolicy.NewRetryPolicy()); */
-
             services.AddContactsService(options =>
             {
                 options.BaseUri = this.Configuration["ServiceEndpoints:ContactsService"]?.ToString();
