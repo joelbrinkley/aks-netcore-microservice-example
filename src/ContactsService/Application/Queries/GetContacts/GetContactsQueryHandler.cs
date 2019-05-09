@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ContactsService.Models;
+using ContactsService.Core;
 using ContactsService.Repository;
 using Microsoft.Azure.Cosmos;
 

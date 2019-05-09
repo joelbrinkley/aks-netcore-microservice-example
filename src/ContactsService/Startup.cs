@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using ContactsService.Commands;
+using ContactsService.Exceptions;
 using ContactsService.Queries;
 using ContactsService.Repository;
 using Microsoft.AspNetCore.Builder;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Middleware;
 
 namespace ContactsService
 {
@@ -34,7 +36,7 @@ namespace ContactsService
 
             var client = new CosmosClient(comsosDbConnectionString);
             CosmosDatabase db = client.Databases.CreateDatabaseIfNotExistsAsync("Contacts").GetAwaiter().GetResult();
-            CosmosContainer contacts = db.Containers.CreateContainerIfNotExistsAsync("Contacts", "/emailaddress", 400).GetAwaiter().GetResult();
+            CosmosContainer contacts = db.Containers.CreateContainerIfNotExistsAsync("Contacts", "/EmailAddress", 400).GetAwaiter().GetResult();
 
             services.AddSingleton(contacts)
                     .AddScoped<IContactRepository, ContactsRepository>()
@@ -46,10 +48,9 @@ namespace ContactsService
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            app.UseExceptionHandlerMiddlware<ContactServiceException>();
+
+            app.UseCors(builder => builder.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
 
             app.UseMvc(routes =>
             {
@@ -57,6 +58,8 @@ namespace ContactsService
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+
         }
 
     }

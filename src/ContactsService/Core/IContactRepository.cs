@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using ContactsService.Exceptions;
-using ContactsService.Models;
+using ContactsService.Core;
 
 namespace ContactsService.Repository
 {

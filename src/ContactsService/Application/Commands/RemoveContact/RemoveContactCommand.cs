@@ -4,12 +4,12 @@ namespace ContactsService.Commands
 {
     public class RemoveContactCommand
     {
-        public string ContactId { get; }
+        public string EmailAddress { get; }
         public DateTime CreatedOn { get; }
 
-        public RemoveContactCommand(string contactId)
+        public RemoveContactCommand(string emailAddress)
         {
-            this.ContactId = contactId;
+            this.EmailAddress = emailAddress;
             this.CreatedOn = DateTime.UtcNow;
         }
     }

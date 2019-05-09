@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using ContactsService.Exceptions;
-using ContactsService.Models;
+using ContactsService.Core;
 using ContactsService.Repository;
 
 namespace ContactsService.Commands

@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ContactsService.Controllers
 {
-    [Route("api/contacts")]
+    [Produces("application/json")]
+    [Route("contacts")]
     public class ContactsController : Controller
     {
         private readonly NewContactCommandHandler newContactHandler;
@@ -32,7 +33,7 @@ namespace ContactsService.Controllers
 
         [HttpPost]
         [Route("")]
-        public async Task<IActionResult> NewContact(NewContactCommand command)
+        public async Task<IActionResult> NewContact([FromBody]NewContactCommand command)
         {
             var result = await this.newContactHandler.Handle(command);
             return Ok(result);

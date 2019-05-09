@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using ContactsService.Exceptions;
-using ContactsService.Models;
+using ContactsService.Core;
 using ContactsService.Repository;
 
 namespace ContactsService.Commands
@@ -16,7 +16,7 @@ namespace ContactsService.Commands
 
         public async Task Handle(RemoveContactCommand command)
         {
-            var existingContact = await contactsRepository.FindAsync(command.ContactId);
+            var existingContact = await contactsRepository.FindAsync(command.EmailAddress);
 
             if (existingContact != null) return;
 

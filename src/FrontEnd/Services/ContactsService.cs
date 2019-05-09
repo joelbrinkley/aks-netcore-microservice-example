@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using FrontEnd.Models;
@@ -14,10 +16,13 @@ namespace FrontEnd.Services
         private HttpClient client;
         public ContactsService(HttpClient client, IOptions<ContactsServiceOptions> options)
         {
-            if(string.IsNullOrEmpty(options.Value.BaseUri)) throw new ArgumentException("ContactsService BaseUri cannot be null or empty");
+            if (string.IsNullOrEmpty(options.Value.BaseUri)) throw new ArgumentException("ContactsService BaseUri cannot be null or empty");
 
             this.client = client;
             this.client.BaseAddress = new Uri(options.Value.BaseUri);
+            this.client.DefaultRequestHeaders
+                .Accept
+                .Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         }
 
@@ -29,18 +34,18 @@ namespace FrontEnd.Services
 
         public async Task RemoveContact(string id)
         {
-           await client.DeleteAsync("/contact/{id}");
+            await client.DeleteAsync("/contact/{id}");
         }
 
-        public async Task<ContactViewModel> Add(ContactViewModel model)
+        public async Task<ServiceResponse<ContactViewModel>> Add(ContactViewModel model)
         {
             var json = JsonConvert.SerializeObject(model);
 
-            var response = await client.PostAsync("/contacts", new StringContent(json, Encoding.UTF8));
+            var response = await client.PostAsync("/contacts", new StringContent(json, Encoding.UTF8, "application/json"));
 
-            var addedContact = JsonConvert.DeserializeObject<ContactViewModel>(response.Content.ToString());
+            var result = await response.ParseResponse<ContactViewModel>();
 
-            return addedContact;
+            return result;
         }
     }
 }

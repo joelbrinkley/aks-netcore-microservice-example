@@ -2,18 +2,20 @@ using System;
 using ContactsService.Exceptions;
 using Newtonsoft.Json;
 
-namespace ContactsService.Models
+namespace ContactsService.Core
 {
     public class Contact
     {
+        [JsonProperty("id")]
+        public string Id { get; }
+        public string EmailAddress { get; set; }
         public string FirstName { get; }
         public string LastName { get; }
-        
-        [JsonProperty("id")]
-        public Email EmailAddress { get; set; }
 
-        public Contact(string firstName, string lastName, Email emailAddress)
+
+        public Contact(string id, string firstName, string lastName, string emailAddress)
         {
+            this.Id = id;
             this.EmailAddress = emailAddress;
             this.LastName = lastName;
             this.FirstName = firstName;
@@ -23,10 +25,12 @@ namespace ContactsService.Models
         {
             if (string.IsNullOrEmpty(firstName)) throw new ContactException("First name is required.");
             if (string.IsNullOrEmpty(lastName)) throw new ContactException("Last name is required.");
+            if (!EmailValidator.Validate(emailAddress)) throw new InvalidEmailException(emailAddress);
 
-            return new Contact(firstName,
+            return new Contact(Guid.NewGuid().ToString(),
+                               firstName,
                                lastName,
-                               new Email(emailAddress));
+                               emailAddress);
         }
 
         public override string ToString()

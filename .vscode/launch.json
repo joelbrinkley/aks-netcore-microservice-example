@@ -30,6 +30,9 @@
       "cwd": "${workspaceFolder}/src/FrontEnd",
       "stopAtEntry": false,
       "console": "internalConsole",
+      "launchBrowser": {
+        "enabled": true
+      },
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

@@ -2,28 +2,13 @@ using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using ContactsService.Exceptions;
+using Newtonsoft.Json;
 
-namespace ContactsService.Models
+namespace ContactsService.Core
 {
-    public class Email
+    public static class EmailValidator
     {
-        public string Value { get; }
-
-        public Email(string emailAddress)
-        {
-            if (!IsValid(emailAddress))
-            {
-                throw new InvalidEmailException(emailAddress);
-            }
-            this.Value = emailAddress;
-        }
-
-        public override string ToString()
-        {
-            return Value;
-        }
-
-        public static bool IsValid(string email)
+        public static bool Validate(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
                 return false;

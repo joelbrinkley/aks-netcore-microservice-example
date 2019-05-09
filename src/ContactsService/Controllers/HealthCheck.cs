@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ContactsService.Controllers
 {
-    [Route("api/healthcheck")]
+    [Route("healthcheck")]
     public class HealthCheck : Controller
     {
         public async Task<IActionResult> Check()
