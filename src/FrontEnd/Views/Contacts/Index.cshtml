@@ -3,11 +3,14 @@
     ViewData["Title"] = "Manage Contacts";
 }
 
-<h1>Index</h1>
+<h1>Contacts</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+<div>
+    @Html.ValidationSummary()
+</div>
 <table class="table">
     <thead>
         <tr>

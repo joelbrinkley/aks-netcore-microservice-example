@@ -16,18 +16,9 @@ namespace ContactsService.Repository
 
         public async Task<Contact> Add(Contact contact)
         {
-            try
-            {
-                var response = await this.container.Items.CreateItemAsync<Contact>(contact.EmailAddress, contact);
-                var newContact = await this.container.Items.ReadItemAsync<Contact>(contact.EmailAddress, contact.Id);
-                return newContact;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.StackTrace);
-            }
-            return null;
-
+            var response = await this.container.Items.CreateItemAsync<Contact>(contact.EmailAddress, contact);
+            var newContact = await this.container.Items.ReadItemAsync<Contact>(contact.EmailAddress, contact.Id);
+            return newContact;
         }
         public async Task Remove(Contact contact)
         {
@@ -50,7 +41,7 @@ namespace ContactsService.Repository
                     return result;
                 }
             }
-            
+
             return null;
         }
     }

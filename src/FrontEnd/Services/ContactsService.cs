@@ -26,25 +26,25 @@ namespace FrontEnd.Services
 
         }
 
-        public async Task<List<ContactViewModel>> GetContacts()
+        public async Task<ServiceResponse<ContactViewModel>> RemoveContact(string email)
         {
-            var response = await client.GetAsync("/contacts");
-            return await response.Content.ReadAsAsync<List<ContactViewModel>>();
+            var response = await client.DeleteAsync($"/contacts/{email}");
+            var result = await response.ParseResponse<ContactViewModel>();
+            return result;
         }
 
-        public async Task RemoveContact(string id)
+        public async Task<ServiceResponse<IEnumerable<ContactViewModel>>> GetContacts()
         {
-            await client.DeleteAsync("/contact/{id}");
+            var response = await this.client.GetAsync("/contacts");
+            var result = await response.ParseResponse<IEnumerable<ContactViewModel>>();
+            return result;
         }
 
         public async Task<ServiceResponse<ContactViewModel>> Add(ContactViewModel model)
         {
             var json = JsonConvert.SerializeObject(model);
-
             var response = await client.PostAsync("/contacts", new StringContent(json, Encoding.UTF8, "application/json"));
-
             var result = await response.ParseResponse<ContactViewModel>();
-
             return result;
         }
     }

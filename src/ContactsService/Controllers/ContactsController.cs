@@ -40,7 +40,7 @@ namespace ContactsService.Controllers
         }
 
         [HttpDelete]
-        [Route("contacts/{id}")]
+        [Route("{id}")]
         public async Task<IActionResult> RemoveContact(string id)
         {
             await this.removeContactHandler.Handle(new RemoveContactCommand(id));

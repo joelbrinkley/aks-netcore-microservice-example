@@ -18,7 +18,7 @@ namespace ContactsService.Commands
         {
             var existingContact = await contactsRepository.FindAsync(command.EmailAddress);
 
-            if (existingContact != null) return;
+            if (existingContact == null) return;
 
             await contactsRepository.Remove(existingContact);
         }

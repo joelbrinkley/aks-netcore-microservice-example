@@ -16,14 +16,34 @@ namespace FrontEnd.Controllers
             this.contactsService = contactsService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var response = await contactsService.GetContacts();
+            if (response.Successful)
+            {
+                return View("Index", response.Result);
+            }
+
+            ModelState.AddModelError(string.Empty, response.ErrorMessage);
             return View("Index", new List<ContactViewModel>());
         }
 
         public IActionResult Create()
         {
             return View("Create", new ContactViewModel());
+        }
+
+        public async Task<IActionResult> Delete(string id)
+        {
+            var response = await contactsService.RemoveContact(id);
+
+            if (response.Successful)
+            {
+                return RedirectToAction("Index");
+            }
+
+            ModelState.AddModelError(string.Empty, response.ErrorMessage);
+            return View("Index");
         }
 
         [HttpPost]
