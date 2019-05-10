@@ -58,8 +58,6 @@ namespace ContactsService
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-
-
         }
 
     }
