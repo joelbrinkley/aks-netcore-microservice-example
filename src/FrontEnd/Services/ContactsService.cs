@@ -11,11 +11,11 @@ using Newtonsoft.Json;
 
 namespace FrontEnd.Services
 {
-    public class ContactsService
+    public class ContactsService : IHttpService
     {
         private HttpClient client;
         
-        public ContactsService(HttpClient client, IOptions<ContactsServiceOptions> options)
+        public ContactsService(HttpClient client, IOptions<ServiceOptions> options)
         {
             if (string.IsNullOrEmpty(options.Value.BaseUri)) throw new ArgumentException("ContactsService BaseUri cannot be null or empty");
 

@@ -1,6 +1,6 @@
 namespace FrontEnd.Services
 {
-    public class ContactsServiceOptions
+    public class ServiceOptions
     {
         public string BaseUri { get; set; }
     }

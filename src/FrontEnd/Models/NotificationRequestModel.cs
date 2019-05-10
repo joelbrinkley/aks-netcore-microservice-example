@@ -6,7 +6,6 @@ namespace FrontEnd.Models
     {
         [Required]
         public string Message { get; set; }
-        public DateTime RequestedOn = DateTime.UtcNow;
 
     }
 }

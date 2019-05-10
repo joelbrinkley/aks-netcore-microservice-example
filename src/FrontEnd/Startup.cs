@@ -27,9 +27,13 @@ namespace FrontEnd
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddContactsService(options =>
+            services.AddHttpService<ContactsService>(options =>
             {
                 options.BaseUri = this.Configuration["ServiceEndpoints:ContactsService"]?.ToString();
+            });
+
+            services.AddHttpService<NotificationService>(options => {
+                options.BaseUri = this.Configuration["ServiceEndpoints:NotificationService"]?.ToString();
             });
 
             services.Configure<CookiePolicyOptions>(options =>
