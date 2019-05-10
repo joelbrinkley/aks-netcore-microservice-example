@@ -21,6 +21,29 @@
       }
     },
     {
+      "name": "Launch Notification Service",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-notificationservice",
+      "program": "${workspaceFolder}/src/NotificationService/bin/Debug/netcoreapp2.2/NotificationService.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/NotificationService",
+      "stopAtEntry": false,
+      "console": "internalConsole",
+      "launchBrowser": {
+        "enabled": true
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    {
+      "name": ".NET Core Attach",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickProcess}"
+    }
+    {
       "name": "Front End (Development)",
       "type": "coreclr",
       "request": "launch",

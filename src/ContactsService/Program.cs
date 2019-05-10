@@ -40,7 +40,6 @@ namespace ContactsService
                          builtConfig["AzureAD:ClientSecret"],
                          new DefaultKeyVaultSecretManager());
                 }
-
             })
             .UseStartup<Startup>();
     }

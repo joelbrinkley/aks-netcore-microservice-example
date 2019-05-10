@@ -2,9 +2,9 @@ using System;
 
 namespace ContactsService.Exceptions
 {
-    public class ContactException : ContactServiceException
+    public class ContactCreationException : ContactServiceException
     {
-        public ContactException(string message) : base(message)
+        public ContactCreationException(string message) : base(message)
         {
         }
     }

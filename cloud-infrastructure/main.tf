@@ -74,12 +74,12 @@ resource "azurerm_servicebus_namespace" "main" {
   tags = "${local.tags}"
 }
 
-resource "azurerm_servicebus_topic" "main" {
+resource "azurerm_servicebus_queue" "main" {
   name                = "notifications"
   resource_group_name = "${azurerm_resource_group.main.name}"
   namespace_name      = "${azurerm_servicebus_namespace.main.name}"
 
-  enable_partitioning = true
+  enable_partitioning = false
 }
 
 resource "random_integer" "main" {
@@ -148,6 +148,7 @@ resource "azurerm_key_vault" "main" {
 
     secret_permissions = [
       "get",
+      "list"
     ]
 
     storage_permissions = [
@@ -195,9 +196,18 @@ resource "azurerm_key_vault" "main" {
 
   tags = "${local.tags}"
 }
+
 resource "azurerm_key_vault_secret" "main" {
   name         = "CosmosdbConnection"
   value        = "AccountEndpoint=${azurerm_cosmosdb_account.main.endpoint};AccountKey=${azurerm_cosmosdb_account.main.primary_master_key};"
+  key_vault_id = "${azurerm_key_vault.main.id}"
+
+  tags = "${local.tags}"
+}
+
+resource "azurerm_key_vault_secret" "notification_connection_string" {
+  name         = "NotificationQueueConnectionString"
+  value        = "${azurerm_servicebus_namespace.main.default_primary_connection_string}"
   key_vault_id = "${azurerm_key_vault.main.id}"
 
   tags = "${local.tags}"

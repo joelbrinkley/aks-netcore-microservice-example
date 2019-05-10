@@ -23,8 +23,8 @@ namespace ContactsService.Core
 
         public static Contact Create(string firstName, string lastName, string emailAddress)
         {
-            if (string.IsNullOrEmpty(firstName)) throw new ContactException("First name is required.");
-            if (string.IsNullOrEmpty(lastName)) throw new ContactException("Last name is required.");
+            if (string.IsNullOrEmpty(firstName)) throw new ContactCreationException("First name is required.");
+            if (string.IsNullOrEmpty(lastName)) throw new ContactCreationException("Last name is required.");
             if (!EmailValidator.Validate(emailAddress)) throw new InvalidEmailException(emailAddress);
 
             return new Contact(Guid.NewGuid().ToString(),
