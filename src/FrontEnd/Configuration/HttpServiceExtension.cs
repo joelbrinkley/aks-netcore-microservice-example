@@ -6,8 +6,9 @@ namespace FrontEnd.Configuration
 {
     public static class HttpServiceExtension
     {
-        public static IServiceCollection AddHttpService<T>(this IServiceCollection collection,
-            Action<ServiceOptions> setupAction) where T : class, IHttpService
+        public static IServiceCollection AddHttpService<T,O>(this IServiceCollection collection,
+            Action<O> setupAction) where T : class, IHttpService
+                                   where O : class
         {
             if (collection == null) throw new ArgumentNullException(nameof(collection));
             if (setupAction == null) throw new ArgumentNullException(nameof(setupAction));

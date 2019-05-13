@@ -6,7 +6,7 @@ using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.Configuration.Json;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration.EnvironmentVariables;
 
 namespace NotificationProcessingService
 {
@@ -50,7 +50,9 @@ namespace NotificationProcessingService
             var builder = new ConfigurationBuilder();
 
 
-            builder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            builder
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .AddEnvironmentVariables();
 
             if (isDevelopment)
             {

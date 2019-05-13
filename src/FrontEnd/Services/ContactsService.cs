@@ -15,7 +15,7 @@ namespace FrontEnd.Services
     {
         private HttpClient client;
         
-        public ContactsService(HttpClient client, IOptions<ServiceOptions> options)
+        public ContactsService(HttpClient client, IOptions<ContactServiceOptions> options)
         {
             if (string.IsNullOrEmpty(options.Value.BaseUri)) throw new ArgumentException("ContactsService BaseUri cannot be null or empty");
 

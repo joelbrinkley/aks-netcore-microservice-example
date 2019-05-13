@@ -13,7 +13,7 @@ namespace FrontEnd.Services
     {
         private HttpClient client;
 
-        public NotificationService(HttpClient client, IOptions<ServiceOptions> options)
+        public NotificationService(HttpClient client, IOptions<NotificationServiceOptions> options)
         {
             if (string.IsNullOrEmpty(options.Value.BaseUri)) throw new ArgumentException("NotificationService BaseUri cannot be null or empty");
 

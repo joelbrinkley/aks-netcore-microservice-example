@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -10,10 +11,13 @@ namespace FrontEnd.Services
     {
         public async static Task<ServiceResponse<T>> ParseResponse<T>(this HttpResponseMessage response)
         {
+            var responseContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"StatusCode: {response.StatusCode}");
+            Console.WriteLine(responseContent);
             string errorMessage = string.Empty;
             T result = default(T);
-            var responseContent = await response.Content.ReadAsStringAsync();
-            
+
+
             if (!response.IsSuccessStatusCode)
             {
                 JObject obj = JObject.Parse(responseContent);
