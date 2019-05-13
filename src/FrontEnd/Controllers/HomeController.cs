@@ -44,7 +44,7 @@ namespace FrontEnd.Controllers
                 return View("Index", model);
             }
 
-            return Redirect("Index");
+            return View("SendMessage");
         }
     }
 }

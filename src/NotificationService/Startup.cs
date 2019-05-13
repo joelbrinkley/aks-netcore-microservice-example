@@ -37,7 +37,7 @@ namespace NotificationService
 
             services.AddMvc();
 
-            services.AddScoped<QueueClient>(x => new QueueClient(notificationQueueConnectionString, notificationQueueName, ReceiveMode.ReceiveAndDelete));
+            services.AddScoped<QueueClient>(x => new QueueClient(notificationQueueConnectionString, notificationQueueName, ReceiveMode.PeekLock));
             services.AddScoped<SendNotificationCommandHandler>();
         }
 

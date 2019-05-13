@@ -15,7 +15,7 @@ namespace NotificationService.Controllers
             this.sendNotificationCommandHandler = sendNotificationCommandHandler;
         }
 
-        public async Task<IActionResult> SendNotification(SendNotificationCommand command)
+        public async Task<IActionResult> SendNotification([FromBody]SendNotificationCommand command)
         {   
             await this.sendNotificationCommandHandler.Handle(command);
             return Ok();
