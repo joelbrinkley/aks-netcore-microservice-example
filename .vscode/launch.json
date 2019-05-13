@@ -36,6 +36,22 @@
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
+    }, {
+      "name": "Launch NotificationProcessingService",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-notificationprocessingservice",
+      "program": "${workspaceFolder}/src/NotificationProcessingService/bin/Debug/netcoreapp2.2/NotificationProcessingService.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/NotificationProcessingService",
+      "stopAtEntry": false,
+      "console": "internalConsole",
+      "launchBrowser": {
+        "enabled": true
+      },
+      "env": {
+        "NETCORE_ENVIRONMENT": "Development"
+      }
     },
     {
       "name": ".NET Core Attach",

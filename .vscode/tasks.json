@@ -22,6 +22,16 @@
             "problemMatcher": "$tsc"
         },
         {
+            "label": "build-notificationprocessingservice",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/NotificationProcessingService/NotificationProcessingService.csproj"
+            ],
+            "problemMatcher": "$tsc"
+        },
+        {
             "label": "build-notificationservice",
             "command": "dotnet",
             "type": "process",
