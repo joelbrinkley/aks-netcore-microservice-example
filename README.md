@@ -1,9 +1,21 @@
 # notificationapp
 
 
-#run docker emulator
-cmd
-set containerName=azure-cosmosdb-emulator
-set hostDirectory=%LOCALAPPDATA%\azure-cosmosdb-emulator.hostd
-md %hostDirectory% 2&gt;nul
-docker run --name %containerName% --memory 2GB --mount "type=bind,source=%hostDirectory%,destination=C:\CosmosDB.Emulator\bind-mount"  --interactive --tty -p 8081:8081 -p 8900:8900 -p 8901:8901 -p 8979:8979 -p 10250:10250 -p 10251:10251 -p 10252:10252 -p 10253:10253 -p 10254:10254 -p 10255:10255 -p 10256:10256 -p 10350:10350 microsoft/azure-cosmosdb-emulator
+# ACR Login
+az acr login --name acr12934
+
+docker login acr12934.azurecr.io
+
+docker tag <image> acr12934.azurecr.io/<image>
+
+docker push acr12934.azurecr.io/<image>
+
+
+## k8s secret
+kubectl create secret docker-registry <SECRET_NAME> 
+  --docker-server <REGISTRY_NAME>.azurecr.io 
+  --docker-email <YOUR_MAIL> 
+  --docker-username=<SERVICE_PRINCIPAL_ID> 
+  --docker-password <YOUR_PASSWORD>
+
+  
