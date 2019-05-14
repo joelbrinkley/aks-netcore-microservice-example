@@ -1,0 +1,41 @@
+version: "3.3"
+services:
+  contacts-service:
+    container_name: contacts-service
+    build:
+      context: ./src/ContactsService
+      dockerfile: ./dockerfile
+    environment:
+        - ASPNETCORE_ENVIRONMENT=docker
+        - AzureAD:ClientId=<secret>
+        - AzureAD:ClientSecret=<secret>
+
+  notification-service:
+    container_name: notification-service
+    build:
+      context: ./src/NotificationService
+      dockerfile: ./dockerfile
+    environment:
+        - ASPNETCORE_ENVIRONMENT=docker
+        - AzureAD:ClientId=<secret>
+        - AzureAD:ClientSecret=<secret>
+
+  notification-processing-service:
+    build:
+      context: ./src/NotificationProcessingService
+      dockerfile: ./dockerfile
+    environment:
+        - NETCORE_ENVIRONMENT=docker
+        - AzureAD:ClientId=<secret>
+        - AzureAD:ClientSecret=<secret>
+
+  notifyapp-frontend:
+    build:
+      context: ./src/FrontEnd
+      dockerfile: ./dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=docker
+      - ServiceEndpoints:ContactsService=http://contacts-service:80
+      - ServiceEndpoints:NotificationService=http://notification-service:80
+    ports:
+      - "9600:80"

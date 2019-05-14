@@ -352,5 +352,5 @@ override.tf.json
 
 
 
-docker-compose.yaml
+#docker-compose.yaml
 **/azurekeyvault.json
