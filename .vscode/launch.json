@@ -1,0 +1,86 @@
+{
+  // Use IntelliSense to find out which attributes exist for C# debugging
+  // Use hover for the description of the existing attributes
+  // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Contact Service",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-contactsservice",
+      "program": "${workspaceFolder}/src/ContactsService/bin/Debug/netcoreapp2.2/ContactsService.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/ContactsService",
+      "stopAtEntry": false,
+      "launchBrowser": {
+        "enabled": true
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    {
+      "name": "Launch Notification Service",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-notificationservice",
+      "program": "${workspaceFolder}/src/NotificationService/bin/Debug/netcoreapp2.2/NotificationService.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/NotificationService",
+      "stopAtEntry": false,
+      "console": "internalConsole",
+      "launchBrowser": {
+        "enabled": true
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }, {
+      "name": "Launch NotificationProcessingService",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-notificationprocessingservice",
+      "program": "${workspaceFolder}/src/NotificationProcessingService/bin/Debug/netcoreapp2.2/NotificationProcessingService.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/NotificationProcessingService",
+      "stopAtEntry": false,
+      "console": "internalConsole",
+      "launchBrowser": {
+        "enabled": true
+      },
+      "env": {
+        "NETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    {
+      "name": ".NET Core Attach",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickProcess}"
+    }
+    {
+      "name": "Front End (Development)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-frontend",
+      "program": "${workspaceFolder}/src/FrontEnd/bin/Debug/netcoreapp2.2/FrontEnd.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/FrontEnd",
+      "stopAtEntry": false,
+      "console": "internalConsole",
+      "launchBrowser": {
+        "enabled": true
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    {
+      "name": ".NET Core Attach",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickProcess}"
+    }
+  ]
+}

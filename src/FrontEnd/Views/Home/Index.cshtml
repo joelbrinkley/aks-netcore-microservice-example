@@ -1,0 +1,15 @@
+﻿@model FrontEnd.Models.NotificationRequestModel;
+@{
+    ViewData["Title"] = "Send Notification";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Send a Notification</h1>
+
+@using (Html.BeginForm("SendMessage", "Home", FormMethod.Post))
+{
+    @Html.TextBoxFor(model => model.Message)
+    @Html.ValidationMessageFor(model => model.Message)
+    <button type="submit">Send</button>
+}
+</div>

@@ -1,0 +1,39 @@
+@model FrontEnd.Models.ContactViewModel
+@{ 
+   ViewBag.Title = "Create Contact"; 
+} 
+<h1>Create Contact</h1>  
+
+<hr/>
+<div class="row">
+   @using (Html.BeginForm("CreateContact", "Contacts", FormMethod.Post))
+   {
+      <div>
+         @Html.ValidationSummary()
+      </div>
+      <div class="form-group"> 
+         <label asp-for = "FirstName" class="control-label"></label> 
+         @Html.TextBoxFor(m => m.FirstName)
+         @Html.ValidationMessageFor(m=>m.FirstName)
+      </div> 
+
+      <div class="form-group"> 
+         <label asp-for = "LastName" class="control-label"></label> 
+         @Html.TextBoxFor(m => m.LastName)
+         @Html.ValidationMessageFor(m=>m.LastName)
+      </div> 
+            
+      <div class="form-group"> 
+         <label asp-for = "EmailAddress" class="control-label"></label> 
+         @Html.TextBoxFor(m => m.EmailAddress)
+         @Html.ValidationMessageFor(m=>m.EmailAddress)
+      </div> 
+
+      <div class="form-group"> 
+         <input type = "submit" value = "Save" class="btn btn-primary"/> 
+      </div> 
+   }
+</div>
+<div>
+    <a asp-action="Index">Back to Contacts</a>
+</div>

@@ -1,0 +1,45 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build-frontend",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/FrontEnd/FrontEnd.csproj"
+            ],
+            "problemMatcher": "$tsc"
+        },
+        {
+            "label": "build-contactsservice",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/ContactsService/ContactsService.csproj"
+            ],
+            "problemMatcher": "$tsc"
+        },
+        {
+            "label": "build-notificationprocessingservice",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/NotificationProcessingService/NotificationProcessingService.csproj"
+            ],
+            "problemMatcher": "$tsc"
+        },
+        {
+            "label": "build-notificationservice",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/NotificationService/NotificationService.csproj"
+            ],
+            "problemMatcher": "$tsc"
+        }      
+    ]
+}
