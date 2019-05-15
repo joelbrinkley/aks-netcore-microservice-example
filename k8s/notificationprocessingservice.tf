@@ -1,5 +1,6 @@
 locals {
   notify_processing_svc_name = "notification-processing-svc"
+  notify_processing_version = "v1"
 }
 
 resource "kubernetes_deployment" "notification_processing_service" {
@@ -8,7 +9,7 @@ resource "kubernetes_deployment" "notification_processing_service" {
 
     labels {
       name       = "${local.notify_processing_svc_name}"
-      version    = "v1"
+      version    = "${local.notify_processing_version}"
       component  = "service"
       part-of    = "notifyapp"
       managed-by = "terraform"
@@ -21,7 +22,7 @@ resource "kubernetes_deployment" "notification_processing_service" {
     selector {
       match_labels {
         name    = "${local.notify_processing_svc_name}"
-        version = "v1"
+        version = "${local.notify_processing_version}"
       }
     }
 
@@ -29,7 +30,7 @@ resource "kubernetes_deployment" "notification_processing_service" {
       metadata {
         labels {
           name    = "${local.notify_processing_svc_name}"
-          version = "v1"
+          version = "${local.notify_processing_version}"
         }
       }
 
@@ -39,7 +40,7 @@ resource "kubernetes_deployment" "notification_processing_service" {
         }]
 
         container {
-          image = "${data.terraform_remote_state.infra.acr_server}/notifyapp-notificationprocessingservice:v1"
+          image = "${data.terraform_remote_state.infra.acr_server}/notifyapp-notificationprocessingservice:${local.notify_processing_version}"
           name  = "notifyapp-notification-processing-service"
 
           env {
@@ -47,14 +48,10 @@ resource "kubernetes_deployment" "notification_processing_service" {
             value = "AKS"
           }
 
-          env {
-            name  = "AzureAD__ClientId"
-            value = "${data.terraform_remote_state.infra.notify_app_client_id}"
-          }
-
-          env {
-            name  = "AzureAD__ClientSecret"
-            value = "${data.terraform_remote_state.infra.notify_app_client_secret}"
+         env_from {
+            secret_ref {
+              name = "clientsecrets"
+            }
           }
         }
       }

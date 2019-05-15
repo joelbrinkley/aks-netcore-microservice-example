@@ -7,12 +7,15 @@ using ContactsService.Commands;
 using ContactsService.Exceptions;
 using ContactsService.Queries;
 using ContactsService.Repository;
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Middleware;
 
 namespace ContactsService
@@ -43,6 +46,17 @@ namespace ContactsService
                     .AddScoped<NewContactCommandHandler>()
                     .AddScoped<RemoveContactCommandHandler>()
                     .AddScoped<GetContactsQueryHandler>();
+
+            services.AddHealthChecks()
+                    .AddCheck("self", () => HealthCheckResult.Healthy())
+                    .AddCheck("cosmosdb", () =>
+                    {
+                        var serviceProvider = services.BuildServiceProvider();
+                        var container = serviceProvider.GetService<CosmosContainer>();
+                        var p = container.ReadStreamAsync().GetAwaiter().GetResult();
+                        if (p.IsSuccessStatusCode) return HealthCheckResult.Healthy();
+                        return HealthCheckResult.Unhealthy();
+                    });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,6 +67,16 @@ namespace ContactsService
             app.UseCors(builder => builder.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
 
             app.UseMvc();
+
+            app.UseHealthChecks("/liveness", new HealthCheckOptions
+            {
+                Predicate = r => r.Name.Contains("self")
+            })
+            .UseHealthChecks("/health", new HealthCheckOptions
+            {
+                Predicate = _ => true,
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+            });
         }
 
     }

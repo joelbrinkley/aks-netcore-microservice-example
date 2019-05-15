@@ -1,5 +1,6 @@
 locals {
   contact_svc_name = "contact-svc"
+  contact_version  = "v2"
 }
 
 resource "kubernetes_deployment" "contact_service" {
@@ -8,7 +9,7 @@ resource "kubernetes_deployment" "contact_service" {
 
     labels {
       name       = "${local.contact_svc_name}"
-      version    = "v1"
+      version    = "${local.contact_version}"
       component  = "service"
       part-of    = "notifyapp"
       managed-by = "terraform"
@@ -21,7 +22,7 @@ resource "kubernetes_deployment" "contact_service" {
     selector {
       match_labels {
         name    = "${local.contact_svc_name}"
-        version = "v1"
+        version = "${local.contact_version}"
       }
     }
 
@@ -29,7 +30,7 @@ resource "kubernetes_deployment" "contact_service" {
       metadata {
         labels {
           name    = "${local.contact_svc_name}"
-          version = "v1"
+          version = "${local.contact_version}"
         }
       }
 
@@ -39,22 +40,42 @@ resource "kubernetes_deployment" "contact_service" {
         }]
 
         container {
-          image = "${data.terraform_remote_state.infra.acr_server}/notifyapp-contactsservice:v1"
+          image = "${data.terraform_remote_state.infra.acr_server}/notifyapp-contactsservice:${local.contact_version}"
           name  = "notifyapp-contact-service"
+
+          liveness_probe {
+            http_get {
+              path = "/liveness"
+              port = 80
+            }
+
+            initial_delay_seconds = 30
+            timeout_seconds       = 10
+            period_seconds        = 15
+            failure_threshold     = 3
+          }
+
+          readiness_probe {
+            http_get {
+              path = "/health"
+              port = 80
+            }
+
+            initial_delay_seconds = 15
+            timeout_seconds       = 10
+            period_seconds        = 10
+            failure_threshold     = 3
+          }
 
           env {
             name  = "ASPNETCORE_ENVIRONMENT"
             value = "AKS"
           }
 
-          env {
-            name  = "AzureAD__ClientId"
-            value = "${data.terraform_remote_state.infra.notify_app_client_id}"
-          }
-
-          env {
-            name  = "AzureAD__ClientSecret"
-            value = "${data.terraform_remote_state.infra.notify_app_client_secret}"
+          env_from {
+            secret_ref {
+              name = "clientsecrets"
+            }
           }
         }
       }
@@ -70,7 +91,7 @@ resource "kubernetes_service" "contact_service" {
   spec {
     selector {
       name    = "${local.contact_svc_name}"
-      version = "v1"
+      version = "${local.contact_version}"
     }
 
     port {

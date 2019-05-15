@@ -14,6 +14,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Middleware;
 using NotificationService.Exceptions;
 using NotificationService.Commands;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace NotificationService
 {
@@ -29,6 +32,8 @@ namespace NotificationService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+
             var notificationQueueConnectionString = this.Configuration["NotificationQueueConnectionString"]?.ToString();
             var notificationQueueName = this.Configuration["NotificationQueueName"]?.ToString();
 
@@ -39,6 +44,13 @@ namespace NotificationService
 
             services.AddScoped<QueueClient>(x => new QueueClient(notificationQueueConnectionString, notificationQueueName, ReceiveMode.PeekLock));
             services.AddScoped<SendNotificationCommandHandler>();
+
+            services.AddHealthChecks()
+                .AddCheck("self", () => HealthCheckResult.Healthy())
+                .AddAzureServiceBusQueue(
+                    notificationQueueConnectionString,
+                    queueName: notificationQueueName,
+                    name: "notifications-servicebus-check");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,6 +61,16 @@ namespace NotificationService
             app.UseCors(builder => builder.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
 
             app.UseMvc();
+
+            app.UseHealthChecks("/liveness", new HealthCheckOptions
+            {
+                Predicate = r => r.Name.Contains("self")
+            })
+              .UseHealthChecks("/health", new HealthCheckOptions
+              {
+                  Predicate = _ => true,
+                  ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+              });
         }
     }
 }
