@@ -50,7 +50,7 @@
         "enabled": true
       },
       "env": {
-        "NETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     {

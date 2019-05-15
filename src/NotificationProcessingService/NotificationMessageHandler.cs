@@ -9,7 +9,6 @@ namespace NotificationProcessingService
     public class NotificationMessageHandler
     {
         private readonly QueueClient queueClient;
-        private bool isRunning = false;
 
         public NotificationMessageHandler(QueueClient queueClient)
         {
@@ -18,9 +17,6 @@ namespace NotificationProcessingService
 
         public void Start()
         {
-            this.isRunning = true;
-
-
             var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
             {
                 MaxConcurrentCalls = 1,
@@ -52,9 +48,5 @@ namespace NotificationProcessingService
             return Task.CompletedTask;
         }
 
-        public void Stop()
-        {
-            this.isRunning = false;
-        }
     }
 }

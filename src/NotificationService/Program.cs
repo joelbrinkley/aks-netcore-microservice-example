@@ -22,7 +22,7 @@ namespace NotificationService
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-             .ConfigureAppConfiguration((context, config) =>
+            .ConfigureAppConfiguration((context, config) =>
             {
                 var builtConfig = config.Build();
 
@@ -42,6 +42,6 @@ namespace NotificationService
                 }
 
             })
-                .UseStartup<Startup>();
+            .UseStartup<Startup>();
     }
 }
