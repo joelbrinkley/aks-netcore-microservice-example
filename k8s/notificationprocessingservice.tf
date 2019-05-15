@@ -1,6 +1,6 @@
 locals {
   notify_processing_svc_name = "notification-processing-svc"
-  notify_processing_version = "v2"
+  notify_processing_version = "v1"
 }
 
 resource "kubernetes_deployment" "notification_processing_service" {

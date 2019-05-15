@@ -1,6 +1,6 @@
 locals {
   contact_svc_name = "contact-svc"
-  contact_version = "v2"
+  contact_version  = "v2"
 }
 
 resource "kubernetes_deployment" "contact_service" {
@@ -55,12 +55,24 @@ resource "kubernetes_deployment" "contact_service" {
             failure_threshold     = 3
           }
 
+          readiness_probe {
+            http_get {
+              path = "/health"
+              port = 80
+            }
+
+            initial_delay_seconds = 15
+            timeout_seconds       = 10
+            period_seconds        = 10
+            failure_threshold     = 3
+          }
+
           env {
             name  = "ASPNETCORE_ENVIRONMENT"
             value = "AKS"
           }
 
-         env_from {
+          env_from {
             secret_ref {
               name = "clientsecrets"
             }
