@@ -1,6 +1,6 @@
 locals {
   notify_processing_svc_name = "notification-processing-svc"
-  notify_processing_version  = "v2"
+  notify_processing_version  = "v3"
 }
 
 resource "kubernetes_deployment" "notification_processing_service" {
@@ -17,7 +17,7 @@ resource "kubernetes_deployment" "notification_processing_service" {
   }
 
   spec {
-    replicas = 2
+    replicas = 3
 
     selector {
       match_labels {

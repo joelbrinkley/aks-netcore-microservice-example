@@ -50,11 +50,11 @@ resource "azurerm_kubernetes_cluster" "main" {
   dns_prefix          = "${var.dns_prefix}"
 
   agent_pool_profile {
-    name            = "default${count.index}"
-    count           = "${var.agent_count}"
-    vm_size         = "Standard_D1_v2"
-    os_type         = "Linux"
-    os_disk_size_gb = 30
+    name                      = "default${count.index}"
+    count                     = "${var.agent_count}"
+    vm_size                   = "Standard_D1_v2"
+    os_type                   = "Linux"
+    os_disk_size_gb           = 30
   }
 
   service_principal {
@@ -148,7 +148,7 @@ resource "azurerm_key_vault" "main" {
 
     secret_permissions = [
       "get",
-      "list"
+      "list",
     ]
 
     storage_permissions = [
@@ -169,7 +169,7 @@ resource "azurerm_key_vault" "main" {
       "delete",
       "recover",
       "backup",
-      "restore"
+      "restore",
     ]
 
     secret_permissions = [
@@ -179,7 +179,7 @@ resource "azurerm_key_vault" "main" {
       "recover",
       "backup",
       "restore",
-      "set"
+      "set",
     ]
 
     storage_permissions = [
@@ -190,7 +190,7 @@ resource "azurerm_key_vault" "main" {
       "delete",
       "recover",
       "backup",
-      "restore"
+      "restore",
     ]
   }
 

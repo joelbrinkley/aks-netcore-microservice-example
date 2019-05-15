@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,12 +25,14 @@ namespace NotificationProcessingService
             };
 
             queueClient.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
-            
+
             Console.WriteLine("Message Handler Started");
         }
 
         private async Task ProcessMessagesAsync(Message message, CancellationToken token)
         {
+            //fake long running process
+            Thread.SpinWait(2000);
             Console.WriteLine(
                 $"Received message: SequenceNumber:{message.SystemProperties.SequenceNumber} Body:{Encoding.UTF8.GetString(message.Body)}"
             );
