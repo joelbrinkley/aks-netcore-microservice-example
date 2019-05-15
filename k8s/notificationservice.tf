@@ -1,5 +1,6 @@
 locals {
   notify_svc_name = "notification-svc"
+  version = "v2"
 }
 
 resource "kubernetes_deployment" "notification_service" {
@@ -8,7 +9,7 @@ resource "kubernetes_deployment" "notification_service" {
 
     labels {
       name       = "${local.notify_svc_name}"
-      version    = "v1"
+      version    = "${local.version}"
       component  = "service"
       part-of    = "notifyapp"
       managed-by = "terraform"
@@ -21,7 +22,7 @@ resource "kubernetes_deployment" "notification_service" {
     selector {
       match_labels {
         name    = "${local.notify_svc_name}"
-        version = "v1"
+        version = "${local.version}"
       }
     }
 
@@ -29,7 +30,7 @@ resource "kubernetes_deployment" "notification_service" {
       metadata {
         labels {
           name    = "${local.notify_svc_name}"
-          version = "v1"
+          version = "${local.version}"
         }
       }
 
@@ -39,8 +40,20 @@ resource "kubernetes_deployment" "notification_service" {
         }]
 
         container {
-          image = "${data.terraform_remote_state.infra.acr_server}/notifyapp-notificationservice:v1"
+          image = "${data.terraform_remote_state.infra.acr_server}/notifyapp-notificationservice:${local.version}"
           name  = "notifyapp-notification-service"
+
+          liveness_probe {
+            http_get {
+              path = "/liveness"
+              port = 80
+            }
+
+            initial_delay_seconds = 30
+            timeout_seconds       = 10
+            period_seconds        = 15
+            failure_threshold     = 3
+          }
 
           env {
             name  = "ASPNETCORE_ENVIRONMENT"
@@ -70,7 +83,7 @@ resource "kubernetes_service" "notification_service" {
   spec {
     selector {
       name    = "${local.notify_svc_name}"
-      version = "v1"
+      version = "${local.version}"
     }
 
     port {

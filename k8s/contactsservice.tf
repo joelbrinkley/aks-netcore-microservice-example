@@ -8,7 +8,7 @@ resource "kubernetes_deployment" "contact_service" {
 
     labels {
       name       = "${local.contact_svc_name}"
-      version    = "v1"
+      version    = "v2"
       component  = "service"
       part-of    = "notifyapp"
       managed-by = "terraform"
@@ -21,7 +21,7 @@ resource "kubernetes_deployment" "contact_service" {
     selector {
       match_labels {
         name    = "${local.contact_svc_name}"
-        version = "v1"
+        version = "v2"
       }
     }
 
@@ -29,7 +29,7 @@ resource "kubernetes_deployment" "contact_service" {
       metadata {
         labels {
           name    = "${local.contact_svc_name}"
-          version = "v1"
+          version = "v2"
         }
       }
 
@@ -39,8 +39,20 @@ resource "kubernetes_deployment" "contact_service" {
         }]
 
         container {
-          image = "${data.terraform_remote_state.infra.acr_server}/notifyapp-contactsservice:v1"
+          image = "${data.terraform_remote_state.infra.acr_server}/notifyapp-contactsservice:v2"
           name  = "notifyapp-contact-service"
+
+          liveness_probe {
+            http_get {
+              path = "/liveness"
+              port = 80
+            }
+
+            initial_delay_seconds = 30
+            timeout_seconds       = 10
+            period_seconds        = 15
+            failure_threshold     = 3
+          }
 
           env {
             name  = "ASPNETCORE_ENVIRONMENT"
@@ -70,7 +82,7 @@ resource "kubernetes_service" "contact_service" {
   spec {
     selector {
       name    = "${local.contact_svc_name}"
-      version = "v1"
+      version = "v2"
     }
 
     port {
