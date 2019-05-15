@@ -1,5 +1,6 @@
 locals {
   frontend_name = "frontend"
+  frontend_version = "v2"
 }
 
 resource "kubernetes_deployment" "frontend" {
@@ -8,7 +9,7 @@ resource "kubernetes_deployment" "frontend" {
 
     labels {
       name       = "${local.frontend_name}"
-      version    = "v2"
+      version    = "${local.frontend_version}"
       component  = "frontend"
       part-of    = "notifyapp"
       managed-by = "terraform"
@@ -21,7 +22,7 @@ resource "kubernetes_deployment" "frontend" {
     selector {
       match_labels {
         name    = "${local.frontend_name}"
-        version = "v2"
+        version = "${local.frontend_version}"
       }
     }
 
@@ -29,7 +30,7 @@ resource "kubernetes_deployment" "frontend" {
       metadata {
         labels {
           name    = "${local.frontend_name}"
-          version = "v2"
+          version = "${local.frontend_version}"
         }
       }
 
@@ -39,7 +40,7 @@ resource "kubernetes_deployment" "frontend" {
         }]
 
         container {
-          image = "${data.terraform_remote_state.infra.acr_server}/notifyapp-frontend:v2"
+          image = "${data.terraform_remote_state.infra.acr_server}/notifyapp-frontend:${local.frontend_version}"
           name  = "notifyapp-frontend-service"
 
           liveness_probe {
@@ -92,7 +93,7 @@ resource "kubernetes_service" "frontend" {
   spec {
     selector {
       name    = "${local.frontend_name}"
-      version = "v2"
+      version = "${local.frontend_version}"
     }
 
     port {

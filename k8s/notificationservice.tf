@@ -1,6 +1,6 @@
 locals {
   notify_svc_name = "notification-svc"
-  version = "v2"
+  notify_version  = "v2"
 }
 
 resource "kubernetes_deployment" "notification_service" {
@@ -9,7 +9,7 @@ resource "kubernetes_deployment" "notification_service" {
 
     labels {
       name       = "${local.notify_svc_name}"
-      version    = "${local.version}"
+      version    = "${local.notify_version}"
       component  = "service"
       part-of    = "notifyapp"
       managed-by = "terraform"
@@ -22,7 +22,7 @@ resource "kubernetes_deployment" "notification_service" {
     selector {
       match_labels {
         name    = "${local.notify_svc_name}"
-        version = "${local.version}"
+        version = "${local.notify_version}"
       }
     }
 
@@ -30,7 +30,7 @@ resource "kubernetes_deployment" "notification_service" {
       metadata {
         labels {
           name    = "${local.notify_svc_name}"
-          version = "${local.version}"
+          version = "${local.notify_version}"
         }
       }
 
@@ -40,7 +40,7 @@ resource "kubernetes_deployment" "notification_service" {
         }]
 
         container {
-          image = "${data.terraform_remote_state.infra.acr_server}/notifyapp-notificationservice:${local.version}"
+          image = "${data.terraform_remote_state.infra.acr_server}/notifyapp-notificationservice:${local.notify_version}"
           name  = "notifyapp-notification-service"
 
           liveness_probe {
@@ -60,15 +60,11 @@ resource "kubernetes_deployment" "notification_service" {
             value = "AKS"
           }
 
-          env {
-            name  = "AzureAD__ClientId"
-            value = "${data.terraform_remote_state.infra.notify_app_client_id}"
-          }
-
-          env {
-            name  = "AzureAD__ClientSecret"
-            value = "${data.terraform_remote_state.infra.notify_app_client_secret}"
-          }
+          env_from {
+            secret_ref {
+              name = "clientsecrets"
+            }
+          }         
         }
       }
     }
@@ -83,7 +79,7 @@ resource "kubernetes_service" "notification_service" {
   spec {
     selector {
       name    = "${local.notify_svc_name}"
-      version = "${local.version}"
+      version = "${local.notify_version}"
     }
 
     port {
