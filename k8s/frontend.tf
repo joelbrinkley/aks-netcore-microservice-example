@@ -61,7 +61,7 @@ resource "kubernetes_deployment" "frontend" {
               port = 80
             }
 
-            initial_delay_seconds = 30
+            initial_delay_seconds = 15
             timeout_seconds       = 10
             period_seconds        = 10
             failure_threshold     = 3
