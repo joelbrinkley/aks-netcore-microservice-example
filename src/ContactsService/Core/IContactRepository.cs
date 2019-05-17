@@ -5,7 +5,7 @@ using ContactsService.Core;
 
 namespace ContactsService.Repository
 {
-    public interface IContactRepository
+    public interface IContactsRepository
     {
         Task<Contact> Add(Contact contact);
         Task Remove(Contact contact);

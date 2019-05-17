@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ContactsService.Commands;
 using ContactsService.Exceptions;
+using ContactsService.Infrastructure.Entityframework;
 using ContactsService.Queries;
 using ContactsService.Repository;
 using HealthChecks.UI.Client;
@@ -12,7 +13,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.Cosmos;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -34,29 +35,30 @@ namespace ContactsService
         {
             services.AddMvc();
 
-            var comsosDbConnectionString = this.Configuration["CosmosdbConnection"]?.ToString();
-            if (string.IsNullOrEmpty(comsosDbConnectionString)) throw new ConfigurationErrorsException("CosmosdbConnection is missing.");
+            var connectionstring = this.Configuration["ContactsDbSqlServerConnection"]?.ToString();
+            if (string.IsNullOrEmpty(connectionstring)) throw new ConfigurationErrorsException("ContactsDbSqlServerConnection is missing.");
 
-            var client = new CosmosClient(comsosDbConnectionString);
-            CosmosDatabase db = client.Databases.CreateDatabaseIfNotExistsAsync("Contacts").GetAwaiter().GetResult();
-            CosmosContainer contacts = db.Containers.CreateContainerIfNotExistsAsync("Contacts", "/EmailAddress", 400).GetAwaiter().GetResult();
+            //resilient sql server connection
+            services.AddDbContext<ContactsContext>(options =>
+            {
+                options.UseSqlServer(connectionstring,
+                sqlServerOptionsAction: sqlOptions =>
+                {
+                    sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 3,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorNumbersToAdd: null);
+                });
+            });
 
-            services.AddSingleton(contacts)
-                    .AddScoped<IContactRepository, ContactsRepository>()
+            services.AddScoped<UnitOfWork>()
                     .AddScoped<NewContactCommandHandler>()
                     .AddScoped<RemoveContactCommandHandler>()
                     .AddScoped<GetContactsQueryHandler>();
 
             services.AddHealthChecks()
                     .AddCheck("self", () => HealthCheckResult.Healthy())
-                    .AddCheck("cosmosdb", () =>
-                    {
-                        var serviceProvider = services.BuildServiceProvider();
-                        var container = serviceProvider.GetService<CosmosContainer>();
-                        var p = container.ReadStreamAsync().GetAwaiter().GetResult();
-                        if (p.IsSuccessStatusCode) return HealthCheckResult.Healthy();
-                        return HealthCheckResult.Unhealthy();
-                    });
+                    .AddSqlServer(connectionString: connectionstring, name: "sqlcheck");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

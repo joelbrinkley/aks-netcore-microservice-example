@@ -50,11 +50,11 @@ resource "azurerm_kubernetes_cluster" "main" {
   dns_prefix          = "${var.dns_prefix}"
 
   agent_pool_profile {
-    name                      = "default${count.index}"
-    count                     = "${var.agent_count}"
-    vm_size                   = "Standard_D1_v2"
-    os_type                   = "Linux"
-    os_disk_size_gb           = 30
+    name            = "default${count.index}"
+    count           = "${var.agent_count}"
+    vm_size         = "Standard_D1_v2"
+    os_type         = "Linux"
+    os_disk_size_gb = 30
   }
 
   service_principal {
@@ -87,31 +87,30 @@ resource "random_integer" "main" {
   max = 99999
 }
 
-resource "azurerm_cosmosdb_account" "main" {
-  name                = "${var.prefix}-cosmos-db-${random_integer.main.result}"
-  location            = "${azurerm_resource_group.main.location}"
+resource "azurerm_sql_server" "main" {
+  name                         = "${var.prefix}-sql"
+  resource_group_name          = "${azurerm_resource_group.main.name}"
+  location                     = "${azurerm_resource_group.main.location}"
+  version                      = "12.0"
+  administrator_login          = "notifydb-admin"
+  administrator_login_password = "${var.sql_password}"
+  tags                         = "${local.tags}"
+}
+
+resource "azurerm_sql_database" "contactsdb" {
+  name                             = "contactsdb"
+  resource_group_name              = "${azurerm_resource_group.main.name}"
+  location                         = "${azurerm_resource_group.main.location}"
+  server_name                      = "${azurerm_sql_server.main.name}"
+  requested_service_objective_name = "S1"
+  tags                             = "${local.tags}"
+}
+resource "azurerm_sql_firewall_rule" "allow_all_azure_ips" {
+  name                = "AllowAllAzureIps"
   resource_group_name = "${azurerm_resource_group.main.name}"
-  offer_type          = "Standard"
-  kind                = "GlobalDocumentDB"
-
-  enable_automatic_failover = true
-
-  consistency_policy {
-    consistency_level       = "BoundedStaleness"
-    max_interval_in_seconds = 10
-    max_staleness_prefix    = 200
-  }
-
-  geo_location {
-    location          = "${var.failover_location}"
-    failover_priority = 1
-  }
-
-  geo_location {
-    prefix            = "${var.prefix}-cosmos-db-${random_integer.main.result}-customid"
-    location          = "${azurerm_resource_group.main.location}"
-    failover_priority = 0
-  }
+  server_name         = "${azurerm_sql_server.main.name}"
+  start_ip_address    = "0.0.0.0"
+  end_ip_address      = "0.0.0.0"
 }
 
 resource "azurerm_container_registry" "main" {
@@ -197,9 +196,9 @@ resource "azurerm_key_vault" "main" {
   tags = "${local.tags}"
 }
 
-resource "azurerm_key_vault_secret" "main" {
-  name         = "CosmosdbConnection"
-  value        = "AccountEndpoint=${azurerm_cosmosdb_account.main.endpoint};AccountKey=${azurerm_cosmosdb_account.main.primary_master_key};"
+resource "azurerm_key_vault_secret" "contactsdb_sql_server_connection" {
+  name         = "ContactsDbSqlServerConnection"
+  value        = "Server=tcp:${azurerm_sql_server.main.fully_qualified_domain_name},1433; Database=${azurerm_sql_database.contactsdb.name};User ID=${azurerm_sql_server.main.administrator_login};Password=${azurerm_sql_server.main.administrator_login_password};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
   key_vault_id = "${azurerm_key_vault.main.id}"
 
   tags = "${local.tags}"

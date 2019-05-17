@@ -6,16 +6,17 @@ namespace ContactsService.Core
 {
     public class Contact
     {
-        [JsonProperty("id")]
-        public string Id { get; }
-        public string EmailAddress { get; set; }
-        public string FirstName { get; }
-        public string LastName { get; }
+        public string EmailAddress { get; private set; }
+        public string FirstName { get; private set; }
+        public string LastName { get; private set; }
 
-
-        public Contact(string id, string firstName, string lastName, string emailAddress)
+        private Contact()
         {
-            this.Id = id;
+
+        }
+
+        public Contact(string firstName, string lastName, string emailAddress)
+        {
             this.EmailAddress = emailAddress;
             this.LastName = lastName;
             this.FirstName = firstName;
@@ -27,8 +28,7 @@ namespace ContactsService.Core
             if (string.IsNullOrEmpty(lastName)) throw new ContactCreationException("Last name is required.");
             if (!EmailValidator.Validate(emailAddress)) throw new InvalidEmailException(emailAddress);
 
-            return new Contact(Guid.NewGuid().ToString(),
-                               firstName,
+            return new Contact(firstName,
                                lastName,
                                emailAddress);
         }
