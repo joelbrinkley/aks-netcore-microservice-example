@@ -31,6 +31,10 @@ variable "failover_location" {
   description = "The fail over location for cosmos db"
 }
 
+variable "sql_password" {
+    type = "string"
+    description = "Azure SQL Server Password"
+}
 variable "service_principal_pw" {}
 variable "tenant_id" {}
 

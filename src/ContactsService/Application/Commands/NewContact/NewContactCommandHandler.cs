@@ -2,28 +2,33 @@ using System.Threading.Tasks;
 using ContactsService.Exceptions;
 using ContactsService.Core;
 using ContactsService.Repository;
+using ContactsService.Infrastructure.Entityframework;
 
 namespace ContactsService.Commands
 {
     public class NewContactCommandHandler
     {
-        private readonly IContactRepository contactsRepository;
+        private readonly UnitOfWork unitOfWork;
 
-        public NewContactCommandHandler(IContactRepository contactsRepository)
+        public NewContactCommandHandler(UnitOfWork unitOfWork)
         {
-            this.contactsRepository = contactsRepository;
+            this.unitOfWork = unitOfWork;
         }
 
         /// Handler is idempotent. Could be called multiple times due to try logic
         public async Task<Contact> Handle(NewContactCommand command)
         {
-            var existingContact = await contactsRepository.FindAsync(command.EmailAddress);
+            var existingContact = await unitOfWork.ContactsRepository.FindAsync(command.EmailAddress);
 
             if (existingContact != null) return existingContact;
 
             var contact = Contact.Create(command.FirstName, command.LastName, command.EmailAddress);
 
-            return await contactsRepository.Add(contact);
+            contact = await unitOfWork.ContactsRepository.Add(contact);
+
+            await unitOfWork.Commit();
+
+            return contact;
         }
     }
 }

@@ -1,35 +1,25 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ContactsService.Core;
+using ContactsService.Infrastructure.Entityframework;
 using ContactsService.Repository;
-using Microsoft.Azure.Cosmos;
+using Microsoft.EntityFrameworkCore;
 
 namespace ContactsService.Queries
 {
     public class GetContactsQueryHandler
     {
-        private readonly CosmosContainer container;
+        private readonly ContactsContext context;
 
-        public GetContactsQueryHandler(CosmosContainer container)
+        public GetContactsQueryHandler(ContactsContext context)
         {
-            this.container = container;
+            this.context = context;
         }
 
         public async Task<IEnumerable<Contact>> Execute(GetContactsQuery query)
         {
-            CosmosResultSetIterator<Contact> queryResultSetIterator = this.container.Items.GetItemIterator<Contact>();
-
-            List<Contact> contacts = new List<Contact>();
-
-            while (queryResultSetIterator.HasMoreResults)
-            {
-                CosmosQueryResponse<Contact> currentResultSet = await queryResultSetIterator.FetchNextSetAsync();
-                foreach (Contact family in currentResultSet)
-                {
-                    contacts.Add(family);
-                }
-            }
-            return contacts;
+            return await context.Contacts.ToListAsync();
         }
     }
 }
