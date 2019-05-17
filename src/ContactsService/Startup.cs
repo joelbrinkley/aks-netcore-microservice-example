@@ -7,7 +7,6 @@ using ContactsService.Commands;
 using ContactsService.Exceptions;
 using ContactsService.Infrastructure.Entityframework;
 using ContactsService.Queries;
-using ContactsService.Repository;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -51,8 +50,7 @@ namespace ContactsService
                 });
             });
 
-            services.AddScoped<UnitOfWork>()
-                    .AddScoped<NewContactCommandHandler>()
+            services.AddScoped<NewContactCommandHandler>()
                     .AddScoped<RemoveContactCommandHandler>()
                     .AddScoped<GetContactsQueryHandler>();
 

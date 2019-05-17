@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using ContactsService.Exceptions;
 using Newtonsoft.Json;
 
@@ -12,7 +13,6 @@ namespace ContactsService.Core
 
         private Contact()
         {
-
         }
 
         public Contact(string firstName, string lastName, string emailAddress)
@@ -28,9 +28,14 @@ namespace ContactsService.Core
             if (string.IsNullOrEmpty(lastName)) throw new ContactCreationException("Last name is required.");
             if (!EmailValidator.Validate(emailAddress)) throw new InvalidEmailException(emailAddress);
 
-            return new Contact(firstName,
-                               lastName,
-                               emailAddress);
+
+            var newContact =
+                new Contact(firstName,
+                            lastName,
+                            emailAddress);
+
+            return newContact;
+
         }
 
         public override string ToString()

@@ -10,6 +10,7 @@ namespace ContactsService.Infrastructure.Entityframework
     public class ContactsContext : DbContext
     {
         public DbSet<Contact> Contacts { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         public ContactsContext(DbContextOptions<ContactsContext> options) : base(options)
         {
@@ -18,7 +19,7 @@ namespace ContactsService.Infrastructure.Entityframework
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
+
             var implementedConfigTypes =
                 Assembly.GetExecutingAssembly()
                     .GetTypes()

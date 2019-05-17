@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using ContactsService.Core;
 using ContactsService.Infrastructure.Entityframework;
-using ContactsService.Repository;
 using Microsoft.EntityFrameworkCore;
 
 namespace ContactsService.Queries

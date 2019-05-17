@@ -1,29 +1,39 @@
 using System.Threading.Tasks;
 using ContactsService.Exceptions;
 using ContactsService.Core;
-using ContactsService.Repository;
 using ContactsService.Infrastructure.Entityframework;
+using ContactsService.Infrastructure;
+using System;
+using Newtonsoft.Json;
 
 namespace ContactsService.Commands
 {
     public class RemoveContactCommandHandler
     {
-        private readonly UnitOfWork unitOfWork;
+        private readonly ContactsContext context;
 
-        public RemoveContactCommandHandler(UnitOfWork unitOfWork)
+        public RemoveContactCommandHandler(ContactsContext context)
         {
-            this.unitOfWork = unitOfWork;
+            this.context = context;
         }
 
         public async Task Handle(RemoveContactCommand command)
         {
-            var existingContact = await unitOfWork.ContactsRepository.FindAsync(command.EmailAddress);
+            var existingContact = await context.Contacts.FindAsync(command.EmailAddress);
 
             if (existingContact == null) return;
 
-            await unitOfWork.ContactsRepository.Remove(existingContact);
+            context.Contacts.Remove(existingContact);
 
-            await unitOfWork.Commit();
+            context.Notifications.Add(new Notification()
+            {
+                Id = Guid.NewGuid(),
+                OccurredOn = DateTime.UtcNow,
+                Type = "ContactRemovedEvent",
+                Data = JsonConvert.SerializeObject(existingContact)
+            });
+
+            await context.SaveChangesAsync();
         }
     }
 }
