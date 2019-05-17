@@ -22,6 +22,16 @@
             "problemMatcher": "$tsc"
         },
         {
+            "label": "build-contactpublisher",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/ContactsNotificationPublisher/ContactsNotificationPublisher.csproj"
+            ],
+            "problemMatcher": "$tsc"
+        },
+        {
             "label": "build-notificationprocessingservice",
             "command": "dotnet",
             "type": "process",
