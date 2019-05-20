@@ -43,13 +43,14 @@ namespace ContactsPublisher
                 var notificationsToPublish = await dbContext.Notifications.Where(x => x.ProcessedOn == null).ToListAsync();
 
                 Console.WriteLine($"{notificationsToPublish.Count} contact notifications found to publish.");
-                
+
                 foreach (var notification in notificationsToPublish)
                 {
+                    notification.ProcessedOn = DateTime.UtcNow;
                     var json = JsonConvert.SerializeObject(notification);
                     var message = new Message(Encoding.UTF8.GetBytes(json));
                     await topicClient.SendAsync(message);
-                    notification.ProcessedOn = DateTime.UtcNow;
+
                 }
                 await dbContext.SaveChangesAsync();
             }

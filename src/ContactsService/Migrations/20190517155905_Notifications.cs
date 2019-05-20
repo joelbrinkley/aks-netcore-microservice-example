@@ -15,7 +15,7 @@ namespace ContactsService.Migrations
                     OccurredOn = table.Column<DateTime>(nullable: false),
                     Type = table.Column<string>(nullable: true),
                     Data = table.Column<string>(nullable: true),
-                    ProcessedOn = table.Column<DateTime>(nullable: false)
+                    ProcessedOn = table.Column<DateTime>(nullable: true)
                 },
                 constraints: table =>
                 {

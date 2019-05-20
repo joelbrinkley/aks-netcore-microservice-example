@@ -29,12 +29,17 @@ namespace NotificationProcessingService
 
             var serviceBusConnectionString = this.Configuration["ServiceBusConnectionString"]?.ToString();
             var notificationQueueName = this.Configuration["NotificationQueueName"]?.ToString();
+            var contactTopicName = this.Configuration["ContactsTopic"]?.ToString();
+            var subscription = this.Configuration["ContactsTopicSubscription"]?.ToString();
 
             if (string.IsNullOrEmpty(serviceBusConnectionString)) throw new ConfigurationErrorsException("ServiceBusConnectionString is missing.");
-            if (string.IsNullOrEmpty(notificationQueueName)) throw new ConfigurationErrorsException("NotificationQueueNameIsMissing");
+            if (string.IsNullOrEmpty(notificationQueueName)) throw new ConfigurationErrorsException("NotificationQueueName is missing");
+            if (string.IsNullOrEmpty(contactTopicName)) throw new ConfigurationErrorsException("ContactTopic is missing");
+            if (string.IsNullOrEmpty(subscription)) throw new ConfigurationErrorsException("ContactTopicSubscription is missing");
 
-            services.AddSingleton<QueueClient>(x => new QueueClient(serviceBusConnectionString, notificationQueueName, ReceiveMode.PeekLock));
-            services.AddSingleton<NotificationMessageHandler>();
+
+            services.AddSingleton(c => new NotificationMessageHandler(new QueueClient(serviceBusConnectionString, notificationQueueName, ReceiveMode.PeekLock)));
+            services.AddSingleton(c => new ContactNotificationHandler(new SubscriptionClient(serviceBusConnectionString, contactTopicName, subscription, ReceiveMode.PeekLock)));
 
             services.AddHealthChecks()
                 .AddCheck("self", () => HealthCheckResult.Healthy())
@@ -61,18 +66,11 @@ namespace NotificationProcessingService
                 ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
             });
 
-            var messagehandler = app.ApplicationServices.GetService<NotificationMessageHandler>();
-            messagehandler.Start();
+            var notificationMessageHandler = app.ApplicationServices.GetService<NotificationMessageHandler>();
+            notificationMessageHandler.Start();
 
-
-            appLifeTime.ApplicationStopping.Register(async () =>
-            {
-                var qclient = app.ApplicationServices.GetService<QueueClient>();
-                if (qclient != null && !qclient.IsClosedOrClosing)
-                {
-                    await qclient.CloseAsync();
-                }
-            });
+            var contactNotificationHandler = app.ApplicationServices.GetService<ContactNotificationHandler>();
+            contactNotificationHandler.Start();
         }
     }
 }
