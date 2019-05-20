@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.Logging;
 
-namespace ContactsNotificationPublisher
+namespace ContactsPublisher
 {
     public class Program
     {

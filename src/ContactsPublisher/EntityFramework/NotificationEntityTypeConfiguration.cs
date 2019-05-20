@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace ContactsService.Infrastructure.Entityframework.EntityConfigurations
+namespace ContactsPublisher
 {
-    public class NotificationEntityTypeConfiguration : IEntityTypeConfiguration<Notification>
+    public class ContactsPublisher : IEntityTypeConfiguration<Notification>
     {
         public void Configure(EntityTypeBuilder<Notification> builder)
         {

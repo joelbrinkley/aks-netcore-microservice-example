@@ -82,6 +82,14 @@ resource "azurerm_servicebus_queue" "main" {
   enable_partitioning = false
 }
 
+resource "azurerm_servicebus_topic" "main" {
+  name                = "contacts"
+  resource_group_name = "${azurerm_resource_group.main.name}"
+  namespace_name      = "${azurerm_servicebus_namespace.main.name}"
+
+  enable_partitioning = false
+}
+
 resource "random_integer" "main" {
   min = 10000
   max = 99999
@@ -205,7 +213,7 @@ resource "azurerm_key_vault_secret" "contactsdb_sql_server_connection" {
 }
 
 resource "azurerm_key_vault_secret" "notification_connection_string" {
-  name         = "NotificationQueueConnectionString"
+  name         = "ServiceBusConnectionString"
   value        = "${azurerm_servicebus_namespace.main.default_primary_connection_string}"
   key_vault_id = "${azurerm_key_vault.main.id}"
 

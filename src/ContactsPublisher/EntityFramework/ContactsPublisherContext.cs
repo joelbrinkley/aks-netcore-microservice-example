@@ -3,13 +3,14 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 
-namespace ContactsNotificationPublisher
+namespace ContactsPublisher
 {
     public class ContactPublisherContext : DbContext
     {
+        public DbSet<Notification> Notifications { get; set; }
+        
         public ContactPublisherContext(DbContextOptions<ContactPublisherContext> options) : base(options)
         {
-            Console.WriteLine("New Context");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -29,12 +30,6 @@ namespace ContactsNotificationPublisher
                 dynamic config = Activator.CreateInstance(configType);
                 modelBuilder.ApplyConfiguration(config);
             }
-        }
-
-        public override void Dispose()
-        {
-            base.Dispose();
-            Console.WriteLine("disposing context");
         }
     }
 }

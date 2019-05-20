@@ -27,19 +27,19 @@ namespace NotificationProcessingService
         {
             services.AddMvc();
 
-            var notificationQueueConnectionString = this.Configuration["NotificationQueueConnectionString"]?.ToString();
+            var serviceBusConnectionString = this.Configuration["ServiceBusConnectionString"]?.ToString();
             var notificationQueueName = this.Configuration["NotificationQueueName"]?.ToString();
 
-            if (string.IsNullOrEmpty(notificationQueueConnectionString)) throw new ConfigurationErrorsException("NotificationQueueConnectionString is missing.");
+            if (string.IsNullOrEmpty(serviceBusConnectionString)) throw new ConfigurationErrorsException("ServiceBusConnectionString is missing.");
             if (string.IsNullOrEmpty(notificationQueueName)) throw new ConfigurationErrorsException("NotificationQueueNameIsMissing");
 
-            services.AddSingleton<QueueClient>(x => new QueueClient(notificationQueueConnectionString, notificationQueueName, ReceiveMode.PeekLock));
+            services.AddSingleton<QueueClient>(x => new QueueClient(serviceBusConnectionString, notificationQueueName, ReceiveMode.PeekLock));
             services.AddSingleton<NotificationMessageHandler>();
 
             services.AddHealthChecks()
                 .AddCheck("self", () => HealthCheckResult.Healthy())
                 .AddAzureServiceBusQueue(
-                    notificationQueueConnectionString,
+                    serviceBusConnectionString,
                     queueName: notificationQueueName,
                     name: "notifications-servicebus-check");
 
@@ -65,12 +65,12 @@ namespace NotificationProcessingService
             messagehandler.Start();
 
 
-            appLifeTime.ApplicationStopping.Register(() =>
+            appLifeTime.ApplicationStopping.Register(async () =>
             {
                 var qclient = app.ApplicationServices.GetService<QueueClient>();
                 if (qclient != null && !qclient.IsClosedOrClosing)
                 {
-                    qclient.CloseAsync().Wait();
+                    await qclient.CloseAsync();
                 }
             });
         }

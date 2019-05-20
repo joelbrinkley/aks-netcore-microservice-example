@@ -1,6 +1,6 @@
 locals {
   contact_svc_name = "contact-svc"
-  contact_version  = "v2"
+  contact_version  = "v1"
 }
 
 resource "kubernetes_deployment" "contact_service" {
@@ -40,6 +40,7 @@ resource "kubernetes_deployment" "contact_service" {
         }]
 
         container {
+          image_pull_policy = "Always"
           image = "${data.terraform_remote_state.infra.acr_server}/notifyapp-contactsservice:${local.contact_version}"
           name  = "notifyapp-contact-service"
 

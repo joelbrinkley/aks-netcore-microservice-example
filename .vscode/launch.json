@@ -38,13 +38,13 @@
       }
     }, 
     {
-      "name": "Launch Contact Notification Publisher",
+      "name": "Launch Contacts Publisher",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "build-contactpublisher",
-      "program": "${workspaceFolder}/src/ContactsNotificationPublisher/bin/Debug/netcoreapp2.2/ContactsNotificationPublisher.dll",
+      "preLaunchTask": "build-contactspublisher",
+      "program": "${workspaceFolder}/src/ContactsPublisher/bin/Debug/netcoreapp2.2/ContactsPublisher.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/src/ContactsNotificationPublisher",
+      "cwd": "${workspaceFolder}/src/ContactsPublisher",
       "stopAtEntry": false,
       "console": "internalConsole",
       "launchBrowser": {

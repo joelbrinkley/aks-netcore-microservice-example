@@ -1,6 +1,6 @@
 using System;
 
-namespace ContactsService.Infrastructure
+namespace ContactsPublisher
 {
     public class Notification
     {

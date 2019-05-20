@@ -32,21 +32,21 @@ namespace NotificationService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var notificationQueueConnectionString = this.Configuration["NotificationQueueConnectionString"]?.ToString();
+            var serviceBusConnectionString = this.Configuration["ServiceBusConnectionString"]?.ToString();
             var notificationQueueName = this.Configuration["NotificationQueueName"]?.ToString();
 
-            if (string.IsNullOrEmpty(notificationQueueConnectionString)) throw new ConfigurationErrorsException("NotificationQueueConnectionString is missing.");
+            if (string.IsNullOrEmpty(serviceBusConnectionString)) throw new ConfigurationErrorsException("ServiceBusConnectionString is missing.");
             if (string.IsNullOrEmpty(notificationQueueName)) throw new ConfigurationErrorsException("NotificationQueueNameIsMissing");
 
             services.AddMvc();
 
-            services.AddScoped<QueueClient>(x => new QueueClient(notificationQueueConnectionString, notificationQueueName, ReceiveMode.PeekLock));
+            services.AddScoped<QueueClient>(x => new QueueClient(serviceBusConnectionString, notificationQueueName, ReceiveMode.PeekLock));
             services.AddScoped<SendNotificationCommandHandler>();
 
             services.AddHealthChecks()
                 .AddCheck("self", () => HealthCheckResult.Healthy())
                 .AddAzureServiceBusQueue(
-                    notificationQueueConnectionString,
+                    serviceBusConnectionString,
                     queueName: notificationQueueName,
                     name: "notifications-servicebus-check");
         }

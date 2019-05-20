@@ -1,6 +1,6 @@
 locals {
   frontend_name    = "frontend"
-  frontend_version = "v2"
+  frontend_version = "v1"
 }
 
 resource "kubernetes_deployment" "frontend" {
@@ -40,8 +40,9 @@ resource "kubernetes_deployment" "frontend" {
         }]
 
         container {
-          image = "${data.terraform_remote_state.infra.acr_server}/notifyapp-frontend:${local.frontend_version}"
-          name  = "notifyapp-frontend-service"
+          image_pull_policy = "Always"
+          image             = "${data.terraform_remote_state.infra.acr_server}/notifyapp-frontend:${local.frontend_version}"
+          name              = "notifyapp-frontend-service"
 
           liveness_probe {
             http_get {
