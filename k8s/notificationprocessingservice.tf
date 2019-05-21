@@ -17,7 +17,7 @@ resource "kubernetes_deployment" "notification_processing_service" {
   }
 
   spec {
-    replicas = 3
+    replicas = 1
 
     selector {
       match_labels {
