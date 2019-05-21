@@ -231,7 +231,7 @@ resource "azurerm_key_vault_secret" "contactsdb_sql_server_connection" {
 }
 
 resource "azurerm_key_vault_secret" "notificationsdb_sql_server_connection" {
-  name         = "ContactsDbSqlServerConnection"
+  name         = "NotificationsDbSqlServerConnection"
   value        = "Server=tcp:${azurerm_sql_server.main.fully_qualified_domain_name},1433; Database=${azurerm_sql_database.notificationsdb.name};User ID=${azurerm_sql_server.main.administrator_login};Password=${azurerm_sql_server.main.administrator_login_password};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
   key_vault_id = "${azurerm_key_vault.main.id}"
 

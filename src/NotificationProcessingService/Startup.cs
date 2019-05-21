@@ -27,6 +27,7 @@ namespace NotificationProcessingService
         {
             services.AddMvc();
 
+            var notificationsdbConnectionString = this.Configuration["NotificationsDbSqlServerConnection"]?.ToString();
             var serviceBusConnectionString = this.Configuration["ServiceBusConnectionString"]?.ToString();
             var notificationQueueName = this.Configuration["NotificationQueueName"]?.ToString();
             var contactTopicName = this.Configuration["ContactsTopic"]?.ToString();
@@ -39,7 +40,7 @@ namespace NotificationProcessingService
 
 
             services.AddSingleton(c => new NotificationMessageHandler(new QueueClient(serviceBusConnectionString, notificationQueueName, ReceiveMode.PeekLock)));
-            services.AddSingleton(c => new ContactNotificationHandler(new SubscriptionClient(serviceBusConnectionString, contactTopicName, subscription, ReceiveMode.PeekLock)));
+            services.AddSingleton(c => new ContactNotificationHandler(new SubscriptionClient(serviceBusConnectionString, contactTopicName, subscription, ReceiveMode.PeekLock), notificationsdbConnectionString));
 
             services.AddHealthChecks()
                 .AddCheck("self", () => HealthCheckResult.Healthy())
@@ -47,7 +48,6 @@ namespace NotificationProcessingService
                     serviceBusConnectionString,
                     queueName: notificationQueueName,
                     name: "notifications-servicebus-check");
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
