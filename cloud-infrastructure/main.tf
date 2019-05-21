@@ -82,6 +82,22 @@ resource "azurerm_servicebus_queue" "main" {
   enable_partitioning = false
 }
 
+resource "azurerm_servicebus_topic" "contacts_topic" {
+  name                = "contacts"
+  resource_group_name = "${azurerm_resource_group.main.name}"
+  namespace_name      = "${azurerm_servicebus_namespace.main.name}"
+
+  enable_partitioning = false
+}
+
+resource "azurerm_servicebus_subscription" "notification_processing_contacts_subscription" {
+  name                = "notification-processing-contact-subscription"
+  resource_group_name = "${azurerm_resource_group.main.name}"
+  namespace_name      = "${azurerm_servicebus_namespace.main.name}"
+  topic_name          = "${azurerm_servicebus_topic.contacts_topic.name}"
+  max_delivery_count  = 50
+}
+
 resource "random_integer" "main" {
   min = 10000
   max = 99999
@@ -98,13 +114,23 @@ resource "azurerm_sql_server" "main" {
 }
 
 resource "azurerm_sql_database" "contactsdb" {
-  name                             = "contactsdb"
-  resource_group_name              = "${azurerm_resource_group.main.name}"
-  location                         = "${azurerm_resource_group.main.location}"
-  server_name                      = "${azurerm_sql_server.main.name}"
-  requested_service_objective_name = "S1"
-  tags                             = "${local.tags}"
+  name                = "contactsdb"
+  resource_group_name = "${azurerm_resource_group.main.name}"
+  location            = "${azurerm_resource_group.main.location}"
+  server_name         = "${azurerm_sql_server.main.name}"
+  edition             = "Basic"
+  tags                = "${local.tags}"
 }
+
+resource "azurerm_sql_database" "notificationsdb" {
+  name                = "notificationsdb"
+  resource_group_name = "${azurerm_resource_group.main.name}"
+  location            = "${azurerm_resource_group.main.location}"
+  server_name         = "${azurerm_sql_server.main.name}"
+  edition             = "Basic"
+  tags                = "${local.tags}"
+}
+
 resource "azurerm_sql_firewall_rule" "allow_all_azure_ips" {
   name                = "AllowAllAzureIps"
   resource_group_name = "${azurerm_resource_group.main.name}"
@@ -204,8 +230,16 @@ resource "azurerm_key_vault_secret" "contactsdb_sql_server_connection" {
   tags = "${local.tags}"
 }
 
+resource "azurerm_key_vault_secret" "notificationsdb_sql_server_connection" {
+  name         = "NotificationsDbSqlServerConnection"
+  value        = "Server=tcp:${azurerm_sql_server.main.fully_qualified_domain_name},1433; Database=${azurerm_sql_database.notificationsdb.name};User ID=${azurerm_sql_server.main.administrator_login};Password=${azurerm_sql_server.main.administrator_login_password};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+  key_vault_id = "${azurerm_key_vault.main.id}"
+
+  tags = "${local.tags}"
+}
+
 resource "azurerm_key_vault_secret" "notification_connection_string" {
-  name         = "NotificationQueueConnectionString"
+  name         = "ServiceBusConnectionString"
   value        = "${azurerm_servicebus_namespace.main.default_primary_connection_string}"
   key_vault_id = "${azurerm_key_vault.main.id}"
 

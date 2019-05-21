@@ -36,7 +36,25 @@
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
-    }, {
+    }, 
+    {
+      "name": "Launch Contacts Publisher",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-contactspublisher",
+      "program": "${workspaceFolder}/src/ContactsPublisher/bin/Debug/netcoreapp2.2/ContactsPublisher.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/ContactsPublisher",
+      "stopAtEntry": false,
+      "console": "internalConsole",
+      "launchBrowser": {
+        "enabled": true
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }, 
+    {
       "name": "Launch NotificationProcessingService",
       "type": "coreclr",
       "request": "launch",

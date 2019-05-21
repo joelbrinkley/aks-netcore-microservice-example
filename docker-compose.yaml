@@ -10,6 +10,16 @@ services:
         - AzureAD:ClientId=<secret>
         - AzureAD:ClientSecret=<secret>
 
+  contacts-publisher:
+    container_name: contacts-publisher
+    build:
+      context: ./src/ContactsPublisher
+      dockerfile: ./dockerfile
+    environment:
+        - ASPNETCORE_ENVIRONMENT=docker
+        - AzureAD:ClientId=<secret>
+        - AzureAD:ClientSecret=<secret>
+
   notification-service:
     container_name: notification-service
     build:

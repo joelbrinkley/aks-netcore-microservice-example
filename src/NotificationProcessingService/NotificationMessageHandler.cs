@@ -1,19 +1,25 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using NotificationProcessingService.EntityFramework;
 
 namespace NotificationProcessingService
 {
     public class NotificationMessageHandler
     {
         private readonly QueueClient queueClient;
+        private DbContextOptions<NotificationsProcessingContext> options;
 
-        public NotificationMessageHandler(QueueClient queueClient)
+        public NotificationMessageHandler(QueueClient queueClient, string dbConnectionString)
         {
             this.queueClient = queueClient;
+            this.options = OptionsFactory.NewDbOptions<NotificationsProcessingContext>(dbConnectionString);
         }
 
         public void Start()
@@ -31,11 +37,24 @@ namespace NotificationProcessingService
 
         private async Task ProcessMessagesAsync(Message message, CancellationToken token)
         {
-            //fake long running process
+            //mock long running process
             Thread.SpinWait(2000);
+
             Console.WriteLine(
                 $"Received message: SequenceNumber:{message.SystemProperties.SequenceNumber} Body:{Encoding.UTF8.GetString(message.Body)}"
             );
+
+            using (var context = new NotificationsProcessingContext(this.options))
+            {
+                var contacts = await context.Contacts.ToListAsync();
+
+                var emails = contacts.Select(x => x.Email);
+
+                foreach (var email in emails)
+                {
+                    Console.WriteLine($"Mock sending notification to {email}");
+                }
+            }
 
             await queueClient.CompleteAsync(message.SystemProperties.LockToken);
         }

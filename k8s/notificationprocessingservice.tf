@@ -1,6 +1,6 @@
 locals {
   notify_processing_svc_name = "notification-processing-svc"
-  notify_processing_version  = "v3"
+  notify_processing_version  = "v1"
 }
 
 resource "kubernetes_deployment" "notification_processing_service" {
@@ -40,8 +40,9 @@ resource "kubernetes_deployment" "notification_processing_service" {
         }]
 
         container {
-          image = "${data.terraform_remote_state.infra.acr_server}/notifyapp-notificationprocessingservice:${local.notify_processing_version}"
-          name  = "notifyapp-notification-processing-service"
+          image_pull_policy = "Always"
+          image             = "${data.terraform_remote_state.infra.acr_server}/notifyapp-notificationprocessingservice:${local.notify_processing_version}"
+          name              = "notifyapp-notification-processing-service"
 
           readiness_probe {
             http_get {

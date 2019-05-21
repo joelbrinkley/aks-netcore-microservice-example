@@ -1,21 +1,19 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using ContactsService.Core;
-using ContactsService.Infrastructure.Entityframework.EntityConfigurations;
 using Microsoft.EntityFrameworkCore;
+using NotificationProcessingService.Core;
 
-namespace ContactsService.Infrastructure.Entityframework
+namespace NotificationProcessingService
 {
-    public class ContactsContext : DbContext
+    public class NotificationsProcessingContext : DbContext
     {
         public DbSet<Contact> Contacts { get; set; }
-        public DbSet<Notification> Notifications { get; set; }
-
-        public ContactsContext(DbContextOptions<ContactsContext> options) : base(options)
+        
+        public NotificationsProcessingContext(DbContextOptions<NotificationsProcessingContext> options) : base(options)
         {
-
         }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

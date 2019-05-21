@@ -1,6 +1,6 @@
 locals {
   notify_svc_name = "notification-svc"
-  notify_version  = "v2"
+  notify_version  = "v1"
 }
 
 resource "kubernetes_deployment" "notification_service" {
@@ -40,8 +40,9 @@ resource "kubernetes_deployment" "notification_service" {
         }]
 
         container {
-          image = "${data.terraform_remote_state.infra.acr_server}/notifyapp-notificationservice:${local.notify_version}"
-          name  = "notifyapp-notification-service"
+          image_pull_policy = "Always"
+          image             = "${data.terraform_remote_state.infra.acr_server}/notifyapp-notificationservice:${local.notify_version}"
+          name              = "notifyapp-notification-service"
 
           liveness_probe {
             http_get {

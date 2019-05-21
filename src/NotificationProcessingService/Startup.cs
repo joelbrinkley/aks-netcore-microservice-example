@@ -27,22 +27,27 @@ namespace NotificationProcessingService
         {
             services.AddMvc();
 
-            var notificationQueueConnectionString = this.Configuration["NotificationQueueConnectionString"]?.ToString();
+            var notificationsdbConnectionString = this.Configuration["NotificationsDbSqlServerConnection"]?.ToString();
+            var serviceBusConnectionString = this.Configuration["ServiceBusConnectionString"]?.ToString();
             var notificationQueueName = this.Configuration["NotificationQueueName"]?.ToString();
+            var contactTopicName = this.Configuration["ContactsTopic"]?.ToString();
+            var subscription = this.Configuration["ContactsTopicSubscription"]?.ToString();
 
-            if (string.IsNullOrEmpty(notificationQueueConnectionString)) throw new ConfigurationErrorsException("NotificationQueueConnectionString is missing.");
-            if (string.IsNullOrEmpty(notificationQueueName)) throw new ConfigurationErrorsException("NotificationQueueNameIsMissing");
+            if (string.IsNullOrEmpty(serviceBusConnectionString)) throw new ConfigurationErrorsException("ServiceBusConnectionString is missing.");
+            if (string.IsNullOrEmpty(notificationQueueName)) throw new ConfigurationErrorsException("NotificationQueueName is missing");
+            if (string.IsNullOrEmpty(contactTopicName)) throw new ConfigurationErrorsException("ContactTopic is missing");
+            if (string.IsNullOrEmpty(subscription)) throw new ConfigurationErrorsException("ContactTopicSubscription is missing");
 
-            services.AddSingleton<QueueClient>(x => new QueueClient(notificationQueueConnectionString, notificationQueueName, ReceiveMode.PeekLock));
-            services.AddSingleton<NotificationMessageHandler>();
+
+            services.AddSingleton(c => new NotificationMessageHandler(new QueueClient(serviceBusConnectionString, notificationQueueName, ReceiveMode.PeekLock),notificationsdbConnectionString));
+            services.AddSingleton(c => new ContactNotificationHandler(new SubscriptionClient(serviceBusConnectionString, contactTopicName, subscription, ReceiveMode.PeekLock), notificationsdbConnectionString));
 
             services.AddHealthChecks()
                 .AddCheck("self", () => HealthCheckResult.Healthy())
                 .AddAzureServiceBusQueue(
-                    notificationQueueConnectionString,
+                    serviceBusConnectionString,
                     queueName: notificationQueueName,
                     name: "notifications-servicebus-check");
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,18 +66,11 @@ namespace NotificationProcessingService
                 ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
             });
 
-            var messagehandler = app.ApplicationServices.GetService<NotificationMessageHandler>();
-            messagehandler.Start();
+            var notificationMessageHandler = app.ApplicationServices.GetService<NotificationMessageHandler>();
+            notificationMessageHandler.Start();
 
-
-            appLifeTime.ApplicationStopping.Register(() =>
-            {
-                var qclient = app.ApplicationServices.GetService<QueueClient>();
-                if (qclient != null && !qclient.IsClosedOrClosing)
-                {
-                    qclient.CloseAsync().Wait();
-                }
-            });
+            var contactNotificationHandler = app.ApplicationServices.GetService<ContactNotificationHandler>();
+            contactNotificationHandler.Start();
         }
     }
 }

@@ -1,32 +1,42 @@
 using System.Threading.Tasks;
 using ContactsService.Exceptions;
 using ContactsService.Core;
-using ContactsService.Repository;
 using ContactsService.Infrastructure.Entityframework;
+using Newtonsoft.Json;
+using ContactsService.Infrastructure;
+using System;
 
 namespace ContactsService.Commands
 {
     public class NewContactCommandHandler
     {
-        private readonly UnitOfWork unitOfWork;
+        private readonly ContactsContext context;
 
-        public NewContactCommandHandler(UnitOfWork unitOfWork)
+        public NewContactCommandHandler(ContactsContext context)
         {
-            this.unitOfWork = unitOfWork;
+            this.context = context;
         }
 
         /// Handler is idempotent. Could be called multiple times due to try logic
         public async Task<Contact> Handle(NewContactCommand command)
         {
-            var existingContact = await unitOfWork.ContactsRepository.FindAsync(command.EmailAddress);
+            var existingContact = await context.Contacts.FindAsync(command.EmailAddress);
 
             if (existingContact != null) return existingContact;
 
             var contact = Contact.Create(command.FirstName, command.LastName, command.EmailAddress);
 
-            contact = await unitOfWork.ContactsRepository.Add(contact);
+            context.Contacts.Add(contact);
 
-            await unitOfWork.Commit();
+            context.Notifications.Add(new Notification()
+            {
+                Id = Guid.NewGuid(),
+                OccurredOn = DateTime.UtcNow,
+                Type = "ContactAddedEvent",
+                Data = JsonConvert.SerializeObject(contact)
+            });
+
+            await context.SaveChangesAsync();
 
             return contact;
         }

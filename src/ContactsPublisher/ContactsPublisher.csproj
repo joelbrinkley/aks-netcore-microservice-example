@@ -3,15 +3,17 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
-    <UserSecretsId>41b4cac1-353b-43a3-ab4b-fc333d3c11ed</UserSecretsId>
+    <UserSecretsId>55b3ecb1-555a-50a2-a24d-fcc43d1ca9ed</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.AzureServiceBus" Version="2.2.4" />
-    <PackageReference Include="AspNetCore.HealthChecks.UI" Version="2.2.27" />
+    <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="3.4.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Extensions.Configuration.AzureKeyVault" Version="2.2.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+    <PackageReference Include="Quartz" Version="3.0.7" />
   </ItemGroup>
+
 </Project>

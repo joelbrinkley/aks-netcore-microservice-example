@@ -1,21 +1,18 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using ContactsService.Core;
-using ContactsService.Infrastructure.Entityframework.EntityConfigurations;
 using Microsoft.EntityFrameworkCore;
 
-namespace ContactsService.Infrastructure.Entityframework
+namespace ContactsPublisher
 {
-    public class ContactsContext : DbContext
+    public class ContactPublisherContext : DbContext
     {
-        public DbSet<Contact> Contacts { get; set; }
         public DbSet<Notification> Notifications { get; set; }
-
-        public ContactsContext(DbContextOptions<ContactsContext> options) : base(options)
+        
+        public ContactPublisherContext(DbContextOptions<ContactPublisherContext> options) : base(options)
         {
-
         }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
