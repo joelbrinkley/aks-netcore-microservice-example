@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using NotificationProcessingService.EntityFramework;
 
 namespace NotificationProcessingService
 {
@@ -17,16 +19,7 @@ namespace NotificationProcessingService
         public NotificationMessageHandler(QueueClient queueClient, string dbConnectionString)
         {
             this.queueClient = queueClient;
-            var optionsBuilder = new DbContextOptionsBuilder<NotificationsProcessingContext>();
-            optionsBuilder.UseSqlServer(dbConnectionString,
-                sqlServerOptionsAction: sqlOptions =>
-                {
-                    sqlOptions.EnableRetryOnFailure(
-                    maxRetryCount: 3,
-                    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    errorNumbersToAdd: null);
-                });
-            this.options = optionsBuilder.Options;
+            this.options = OptionsFactory.NewDbOptions<NotificationsProcessingContext>(dbConnectionString);
         }
 
         public void Start()
@@ -54,7 +47,7 @@ namespace NotificationProcessingService
             using (var context = new NotificationsProcessingContext(this.options))
             {
                 var contacts = await context.Contacts.ToListAsync();
-                
+
                 var emails = contacts.Select(x => x.Email);
 
                 foreach (var email in emails)

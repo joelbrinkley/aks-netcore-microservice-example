@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NotificationProcessingService.Core;
+using NotificationProcessingService.EntityFramework;
 
 namespace NotificationProcessingService
 {
@@ -17,19 +19,19 @@ namespace NotificationProcessingService
         private readonly SubscriptionClient subscriptionClient;
         private DbContextOptions<NotificationsProcessingContext> options;
 
+        private Dictionary<string, Action<JObject>> eventActions;
+
         public ContactNotificationHandler(SubscriptionClient subscriptionClient, string dbConnectionString)
         {
             this.subscriptionClient = subscriptionClient;
-            var optionsBuilder = new DbContextOptionsBuilder<NotificationsProcessingContext>();
-            optionsBuilder.UseSqlServer(dbConnectionString,
-                sqlServerOptionsAction: sqlOptions =>
-                {
-                    sqlOptions.EnableRetryOnFailure(
-                    maxRetryCount: 3,
-                    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    errorNumbersToAdd: null);
-                });
-            this.options = optionsBuilder.Options;
+
+            this.options = OptionsFactory.NewDbOptions<NotificationsProcessingContext>(dbConnectionString);
+
+            eventActions = new Dictionary<string, Action<JObject>>()
+            {
+                {"ContactRemovedEvent", async (obj) => { await RemoveContact(obj);}},
+                {"ContactAddedEvent"  , async (obj) => { await AddContact(obj);   }}
+            };
         }
 
         public void Start()
@@ -54,20 +56,11 @@ namespace NotificationProcessingService
             );
 
             JObject obj = JObject.Parse(json);
+
             JObject content = JObject.Parse(obj["Data"]?.ToString());
 
-            if (string.Equals(obj["Type"].ToString(), "ContactRemovedEvent", StringComparison.CurrentCultureIgnoreCase))
-            {
-                await RemoveContact(content);
-            }
-            else if (string.Equals(obj["Type"].ToString(), "ContactAddedEvent", StringComparison.CurrentCultureIgnoreCase))
-            {
-                await AddContact(content);
-            }
-            else
-            {
-                Console.WriteLine("Unable to handle:\r\n" + json);
-            }
+            eventActions[obj["Type"].ToString()](content);
+
             await subscriptionClient.CompleteAsync(message.SystemProperties.LockToken);
         }
 

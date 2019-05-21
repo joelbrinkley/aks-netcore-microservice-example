@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ContactsPublisher.EntityFramework;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -18,20 +19,11 @@ namespace ContactsPublisher
         private readonly string serviceBusConnectionString;
         private readonly string topicName;
 
-        public NotificationPublisher(string connectionString, string serviceBusConnectionString, string topicName)
+        public NotificationPublisher(string dbConnectionString, string serviceBusConnectionString, string topicName)
         {
             this.topicName = topicName;
             this.serviceBusConnectionString = serviceBusConnectionString;
-            var optionsBuilder = new DbContextOptionsBuilder<ContactPublisherContext>();
-            optionsBuilder.UseSqlServer(connectionString,
-                sqlServerOptionsAction: sqlOptions =>
-                {
-                    sqlOptions.EnableRetryOnFailure(
-                    maxRetryCount: 3,
-                    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    errorNumbersToAdd: null);
-                });
-            this.options = optionsBuilder.Options;
+            var options = OptionsFactory.NewDbOptions<ContactPublisherContext>(dbConnectionString);
         }
 
         public async Task Execute(IJobExecutionContext context)
