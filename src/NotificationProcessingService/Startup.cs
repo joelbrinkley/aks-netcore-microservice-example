@@ -39,7 +39,7 @@ namespace NotificationProcessingService
             if (string.IsNullOrEmpty(subscription)) throw new ConfigurationErrorsException("ContactTopicSubscription is missing");
 
 
-            services.AddSingleton(c => new NotificationMessageHandler(new QueueClient(serviceBusConnectionString, notificationQueueName, ReceiveMode.PeekLock)));
+            services.AddSingleton(c => new NotificationMessageHandler(new QueueClient(serviceBusConnectionString, notificationQueueName, ReceiveMode.PeekLock),notificationsdbConnectionString));
             services.AddSingleton(c => new ContactNotificationHandler(new SubscriptionClient(serviceBusConnectionString, contactTopicName, subscription, ReceiveMode.PeekLock), notificationsdbConnectionString));
 
             services.AddHealthChecks()
