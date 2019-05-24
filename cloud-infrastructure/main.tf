@@ -3,7 +3,7 @@ locals {
     owner   = "Joel Brinkley"
     creator = "Joel Brinkley"
     source  = "Terraform"
-    app     = "notificationapp"
+    app     = "communications-app"
   }
 }
 
@@ -75,7 +75,7 @@ resource "azurerm_servicebus_namespace" "main" {
 }
 
 resource "azurerm_servicebus_queue" "main" {
-  name                = "notifications"
+  name                = "communications"
   resource_group_name = "${azurerm_resource_group.main.name}"
   namespace_name      = "${azurerm_servicebus_namespace.main.name}"
 
@@ -90,8 +90,8 @@ resource "azurerm_servicebus_topic" "contacts_topic" {
   enable_partitioning = false
 }
 
-resource "azurerm_servicebus_subscription" "notification_processing_contacts_subscription" {
-  name                = "notification-processing-contact-subscription"
+resource "azurerm_servicebus_subscription" "communication_processing_contacts_subscription" {
+  name                = "communication-processing-contact-subscription"
   resource_group_name = "${azurerm_resource_group.main.name}"
   namespace_name      = "${azurerm_servicebus_namespace.main.name}"
   topic_name          = "${azurerm_servicebus_topic.contacts_topic.name}"
@@ -122,8 +122,8 @@ resource "azurerm_sql_database" "contactsdb" {
   tags                = "${local.tags}"
 }
 
-resource "azurerm_sql_database" "notificationsdb" {
-  name                = "notificationsdb"
+resource "azurerm_sql_database" "communicationsdb" {
+  name                = "communicationsdb"
   resource_group_name = "${azurerm_resource_group.main.name}"
   location            = "${azurerm_resource_group.main.location}"
   server_name         = "${azurerm_sql_server.main.name}"
@@ -230,15 +230,15 @@ resource "azurerm_key_vault_secret" "contactsdb_sql_server_connection" {
   tags = "${local.tags}"
 }
 
-resource "azurerm_key_vault_secret" "notificationsdb_sql_server_connection" {
-  name         = "NotificationsDbSqlServerConnection"
-  value        = "Server=tcp:${azurerm_sql_server.main.fully_qualified_domain_name},1433; Database=${azurerm_sql_database.notificationsdb.name};User ID=${azurerm_sql_server.main.administrator_login};Password=${azurerm_sql_server.main.administrator_login_password};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+resource "azurerm_key_vault_secret" "communicationsdb_sql_server_connection" {
+  name         = "communicationsDbSqlServerConnection"
+  value        = "Server=tcp:${azurerm_sql_server.main.fully_qualified_domain_name},1433; Database=${azurerm_sql_database.communicationsdb.name};User ID=${azurerm_sql_server.main.administrator_login};Password=${azurerm_sql_server.main.administrator_login_password};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
   key_vault_id = "${azurerm_key_vault.main.id}"
 
   tags = "${local.tags}"
 }
 
-resource "azurerm_key_vault_secret" "notification_connection_string" {
+resource "azurerm_key_vault_secret" "communication_connection_string" {
   name         = "ServiceBusConnectionString"
   value        = "${azurerm_servicebus_namespace.main.default_primary_connection_string}"
   key_vault_id = "${azurerm_key_vault.main.id}"

@@ -6,17 +6,17 @@ WORKDIR /src
 COPY /src/Communications/Communications.Messages/Communications.Messages.csproj /src/Communications/Communications.Messages/
 COPY /src/Communications/Communications.DataAccess/Communications.DataAccess.csproj  /src/Communications/Communications.DataAccess/
 
-WORKDIR /src/Communications/Communications.Api
-COPY /src/Communications/Communications.Api/Communications.Api.csproj .
+WORKDIR /src/Communications/Communications.Backend
+COPY /src/Communications/Communications.Backend/Communications.Backend.csproj .
 RUN dotnet restore
 
 
 # Copy everything else and build
 COPY /src/Communications/Communications.Messages/ /src/Communications/Communications.Messages/
 COPY /src/Communications/Communications.DataAccess/ /src/Communications/Communications.DataAccess/
-COPY /src/Communications/Communications.Api/ /src/Communications/Communications.Api/
+COPY /src/Communications/Communications.Backend/ /src/Communications/Communications.Backend/
 
-WORKDIR /src/Communications/Communications.Api
+WORKDIR /src/Communications/Communications.Backend
 
 RUN dotnet publish -c Release -o /out
 
@@ -24,4 +24,4 @@ RUN dotnet publish -c Release -o /out
 FROM microsoft/dotnet:aspnetcore-runtime
 WORKDIR /app
 COPY --from=build-env /out .
-ENTRYPOINT ["dotnet", "Communications.Api.dll"]
+ENTRYPOINT ["dotnet", "Communications.Backend.dll"]

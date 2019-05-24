@@ -6,16 +6,17 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using FrontEnd.Models;
 using FrontEnd.Services;
+using Communications.Messages;
 
 namespace FrontEnd.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly NotificationService notificationService;
+        private readonly CommunicationsService communicationsService;
 
-        public HomeController(NotificationService notificationService)
+        public HomeController(CommunicationsService communicationsService)
         {
-            this.notificationService = notificationService;
+            this.communicationsService = communicationsService;
         }
 
         public IActionResult Index()
@@ -29,14 +30,14 @@ namespace FrontEnd.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public async Task<IActionResult> SendMessage(NotificationRequestModel model)
+        public async Task<IActionResult> SendMessage(SendCommunicationCommand model)
         {
             if (!ModelState.IsValid)
             {
                 return View("Index", model);
             }
 
-            var response = await notificationService.SendMessage(model);
+            var response = await communicationsService.SendCommunication(model);
 
             if (!response.Successful)
             {

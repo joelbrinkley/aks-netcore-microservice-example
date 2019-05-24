@@ -1,6 +1,6 @@
 variable "prefix" {
   type    = "string"
-  default = "notification-app"
+  default = "communications-app"
 }
 
 variable "location" {

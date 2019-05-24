@@ -5,7 +5,7 @@ namespace FrontEnd.Services
         public string BaseUri { get; set; }
     }
 
-    public class NotificationServiceOptions
+    public class CommunicationsServiceOptions
     {
         public string BaseUri { get; set; }
     }

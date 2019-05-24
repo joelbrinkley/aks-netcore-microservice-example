@@ -1,51 +1,51 @@
 version: "3.3"
 services:
-  contacts-service:
-    container_name: contacts-service
+  contacts-api:
+    container_name: contacts-api
     build:
-      context: ./src/ContactsService
-      dockerfile: ./dockerfile
+      context: ./
+      dockerfile: ./src/Contacts/Contacts.Api/dockerfile
     environment:
         - ASPNETCORE_ENVIRONMENT=docker
         - AzureAD:ClientId=<secret>
         - AzureAD:ClientSecret=<secret>
 
   contacts-publisher:
-    container_name: contacts-publisher
+    container_name: contacts-notificationpublisher
     build:
-      context: ./src/ContactsPublisher
-      dockerfile: ./dockerfile
+      context: ./
+      dockerfile: ./src/Contacts/Contacts.NotificationPublisher/dockerfile
     environment:
         - ASPNETCORE_ENVIRONMENT=docker
         - AzureAD:ClientId=<secret>
         - AzureAD:ClientSecret=<secret>
 
-  notification-service:
-    container_name: notification-service
+  communications-api:
+    container_name: communications-api
     build:
-      context: ./src/NotificationService
-      dockerfile: ./dockerfile
+      context: ./
+      dockerfile: ./src/Communications/Communications.Api/dockerfile
     environment:
         - ASPNETCORE_ENVIRONMENT=docker
         - AzureAD:ClientId=<secret>
         - AzureAD:ClientSecret=<secret>
 
-  notification-processing-service:
+  communications-backend:
     build:
-      context: ./src/NotificationProcessingService
-      dockerfile: ./dockerfile
+      context: ./
+      dockerfile: ./src/Communications/Communications.Backend/dockerfile
     environment:
         - NETCORE_ENVIRONMENT=docker
         - AzureAD:ClientId=<secret>
         - AzureAD:ClientSecret=<secret>
 
-  notifyapp-frontend:
+  frontend:
     build:
-      context: ./src/FrontEnd
-      dockerfile: ./dockerfile
+      context: ./
+      dockerfile: ./src/FrontEnd/dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=docker
-      - ServiceEndpoints:ContactsService=http://contacts-service:80
-      - ServiceEndpoints:NotificationService=http://notification-service:80
+      - ServiceEndpoints:ContactsService=http://contacts-api:80
+      - ServiceEndpoints:NotificationService=http://communications-api:80
     ports:
       - "9600:80"

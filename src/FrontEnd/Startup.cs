@@ -30,17 +30,17 @@ namespace FrontEnd
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var contactServiceEndpoint = this.Configuration["ServiceEndpoints:ContactsService"]?.ToString();
-            var notificationServiceEndpoint = this.Configuration["ServiceEndpoints:NotificationService"]?.ToString();
+            var contactsApiEndpoint = this.Configuration["ServiceEndpoints:ContactsApi"]?.ToString();
+            var communicationsApiEndpoint = this.Configuration["ServiceEndpoints:CommunicationsApi"]?.ToString();
 
             services.AddHttpService<ContactsService, ContactServiceOptions>(options =>
             {
-                options.BaseUri = contactServiceEndpoint;
+                options.BaseUri = contactsApiEndpoint;
             });
 
-            services.AddHttpService<NotificationService, NotificationServiceOptions>(options =>
+            services.AddHttpService<CommunicationsService, CommunicationsServiceOptions>(options =>
             {
-                options.BaseUri = notificationServiceEndpoint;
+                options.BaseUri = communicationsApiEndpoint;
             });
 
             services.Configure<CookiePolicyOptions>(options =>
@@ -54,8 +54,8 @@ namespace FrontEnd
 
             services.AddHealthChecks()
                     .AddCheck("self", () => HealthCheckResult.Healthy())
-                    .AddUrlGroup(new Uri($"{contactServiceEndpoint}/health"), "contactservice-check")
-                    .AddUrlGroup(new Uri($"{notificationServiceEndpoint}/health"), "notificationservice-check");
+                    .AddUrlGroup(new Uri($"{contactsApiEndpoint}/health"), "contactservice-check")
+                    .AddUrlGroup(new Uri($"{communicationsApiEndpoint}/health"), "notificationservice-check");
 
         }
 

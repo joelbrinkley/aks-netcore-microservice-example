@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Contacts.Commands;
 using FrontEnd.Models;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -14,7 +15,7 @@ namespace FrontEnd.Services
     public class ContactsService : IHttpService
     {
         private HttpClient client;
-        
+
         public ContactsService(HttpClient client, IOptions<ContactServiceOptions> options)
         {
             if (string.IsNullOrEmpty(options.Value.BaseUri)) throw new ArgumentException("ContactsService BaseUri cannot be null or empty");
@@ -43,7 +44,8 @@ namespace FrontEnd.Services
 
         public async Task<ServiceResponse<ContactViewModel>> Add(ContactViewModel model)
         {
-            var json = JsonConvert.SerializeObject(model);
+            var newContactCommand = new NewContactCommand(model.FirstName, model.LastName, model.EmailAddress);
+            var json = JsonConvert.SerializeObject(newContactCommand);
             var response = await client.PostAsync("/contacts", new StringContent(json, Encoding.UTF8, "application/json"));
             var result = await response.ParseResponse<ContactViewModel>();
             return result;
