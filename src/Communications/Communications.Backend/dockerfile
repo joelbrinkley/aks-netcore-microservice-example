@@ -4,6 +4,7 @@ FROM microsoft/dotnet:sdk AS build-env
 WORKDIR /src
 
 COPY /src/Communications/Communications.Messages/Communications.Messages.csproj /src/Communications/Communications.Messages/
+COPY /src/Contacts/Contacts.Messages/Contacts.Messages.csproj /src/Contacts/Contacts.Messages/
 COPY /src/Communications/Communications.DataAccess/Communications.DataAccess.csproj  /src/Communications/Communications.DataAccess/
 
 WORKDIR /src/Communications/Communications.Backend
@@ -13,6 +14,7 @@ RUN dotnet restore
 
 # Copy everything else and build
 COPY /src/Communications/Communications.Messages/ /src/Communications/Communications.Messages/
+COPY /src/Contacts/Contacts.Messages/ /src/Contacts/Contacts.Messages/
 COPY /src/Communications/Communications.DataAccess/ /src/Communications/Communications.DataAccess/
 COPY /src/Communications/Communications.Backend/ /src/Communications/Communications.Backend/
 

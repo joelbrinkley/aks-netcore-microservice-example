@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 using Communications.DataAccess;
 using Contacts.Messages.Notifications;
 
-namespace Communications.Service.Backend
+namespace Communications.Backend.Handlers
 {
     public class ContactAddedHandler
     {
@@ -52,7 +52,7 @@ namespace Communications.Service.Backend
             using (var context = new CommunicationsContext(this.options))
             {
                 context.Contacts.Add(new Contact(0, notificationEvent.Email));
-                
+
                 await context.SaveChangesAsync();
             }
 

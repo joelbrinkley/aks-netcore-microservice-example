@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 using Communications.Messages;
 using Communications.DataAccess;
 
-namespace Communications.Service.Backend
+namespace Communications.Backend.Handlers
 {
     public class SendCommunicationCommandHandler
     {
@@ -47,7 +47,7 @@ namespace Communications.Service.Backend
             );
 
             var command = JsonConvert.DeserializeObject<SendCommunicationCommand>(Encoding.UTF8.GetString(message.Body));
-            
+
             using (var context = new CommunicationsContext(this.options))
             {
                 var contacts = await context.Contacts.ToListAsync();

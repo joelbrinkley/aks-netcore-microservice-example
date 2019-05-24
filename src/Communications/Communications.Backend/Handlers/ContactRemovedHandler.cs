@@ -12,14 +12,12 @@ using Newtonsoft.Json.Linq;
 using Communications.DataAccess;
 using Contacts.Messages.Notifications;
 
-namespace Communications.Service.Backend
+namespace Communications.Backend.Handlers
 {
     public class ContactRemovedHandler
     {
         private readonly SubscriptionClient subscriptionClient;
         private DbContextOptions<CommunicationsContext> options;
-
-        private Dictionary<string, Action<JObject>> eventActions;
 
         public ContactRemovedHandler(SubscriptionClient subscriptionClient, string dbConnectionString)
         {
