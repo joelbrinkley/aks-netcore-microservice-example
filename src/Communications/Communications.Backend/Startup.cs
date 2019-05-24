@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Communications.Backend.Handlers;
+using Communications.Backend.Subscriptions;
 
 namespace Communications.Backend
 {
@@ -40,10 +41,9 @@ namespace Communications.Backend
             if (string.IsNullOrEmpty(subscription)) throw new ConfigurationErrorsException("ContactTopicSubscription is missing");
 
 
-            services.AddSingleton(c => new SendCommunicationCommandHandler(new QueueClient(serviceBusConnectionString, communicationsQueueName, ReceiveMode.PeekLock), communicationsdbConnectionString));
-            services.AddSingleton(c => new ContactRemovedHandler(new SubscriptionClient(serviceBusConnectionString, contactTopicName, subscription, ReceiveMode.PeekLock), communicationsdbConnectionString));
-            services.AddSingleton(c => new ContactAddedHandler(new SubscriptionClient(serviceBusConnectionString, contactTopicName, subscription, ReceiveMode.PeekLock), communicationsdbConnectionString));
-            
+            services.AddSingleton(c => new SendCommunicationSubscription(new QueueClient(serviceBusConnectionString, communicationsQueueName, ReceiveMode.PeekLock), communicationsdbConnectionString));
+            services.AddSingleton(c => new ContactsSubscription(new SubscriptionClient(serviceBusConnectionString, contactTopicName, subscription, ReceiveMode.PeekLock), communicationsdbConnectionString));
+
             services.AddHealthChecks()
                 .AddCheck("self", () => HealthCheckResult.Healthy())
                 .AddAzureServiceBusQueue(
@@ -68,14 +68,11 @@ namespace Communications.Backend
                 ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
             });
 
-            var sendCommunicationCommandHandler = app.ApplicationServices.GetService<SendCommunicationCommandHandler>();
-            sendCommunicationCommandHandler.Start();
+            var sendCommunicationSubscription = app.ApplicationServices.GetService<SendCommunicationSubscription>();
+            sendCommunicationSubscription.Start();
 
-            var contactRemovedHandler = app.ApplicationServices.GetService<ContactRemovedHandler>();
-            contactRemovedHandler.Start();
-
-             var contactAddedHandler = app.ApplicationServices.GetService<ContactAddedHandler>();
-            contactAddedHandler.Start();
+            var contactsSubscription = app.ApplicationServices.GetService<ContactsSubscription>();
+            contactsSubscription.Start();
         }
     }
 }

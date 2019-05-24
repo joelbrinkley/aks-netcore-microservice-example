@@ -14,24 +14,19 @@ using Contacts.Messages.Notifications;
 
 namespace Communications.Backend.Handlers
 {
-    public class ContactRemovedHandler
+    public class ContactCreatedHandler
     {
         private readonly CommunicationsContext context;
 
-        public ContactRemovedHandler(CommunicationsContext context)
+        public ContactCreatedHandler(CommunicationsContext context)
         {
             this.context = context;
         }
 
-        public async Task Handle(ContactRemovedEventNotification notification)
+        public Task Handle(ContactCreatedEventNotification notification)
         {
-            var existingContact = await context.Contacts
-                .FirstOrDefaultAsync(x => string.Equals(x.Email, notification.Email, StringComparison.CurrentCultureIgnoreCase));
-
-            if (existingContact != null)
-            {
-                context.Contacts.Remove(existingContact);
-            }
-        }
+            context.Contacts.Add(new Contact(0, notification.Email));
+            return Task.CompletedTask;
+        }  
     }
 }

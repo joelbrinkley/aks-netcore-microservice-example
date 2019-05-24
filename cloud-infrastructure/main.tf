@@ -90,8 +90,8 @@ resource "azurerm_servicebus_topic" "contacts_topic" {
   enable_partitioning = false
 }
 
-resource "azurerm_servicebus_subscription" "communication_processing_contacts_subscription" {
-  name                = "communication-processing-contact-subscription"
+resource "azurerm_servicebus_subscription" "communication_backend_contacts_subscription" {
+  name                = "communication-backend-contact-subscription"
   resource_group_name = "${azurerm_resource_group.main.name}"
   namespace_name      = "${azurerm_servicebus_namespace.main.name}"
   topic_name          = "${azurerm_servicebus_topic.contacts_topic.name}"

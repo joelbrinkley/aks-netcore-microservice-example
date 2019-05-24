@@ -15,64 +15,26 @@ namespace Communications.Backend.Handlers
 {
     public class SendCommunicationCommandHandler
     {
-        private readonly QueueClient queueClient;
-        private DbContextOptions<CommunicationsContext> options;
+        private readonly CommunicationsContext context;
 
-        public SendCommunicationCommandHandler(QueueClient queueClient, string dbConnectionString)
+        public SendCommunicationCommandHandler(CommunicationsContext context)
         {
-            this.queueClient = queueClient;
-            this.options = OptionsFactory.NewDbOptions<CommunicationsContext>(dbConnectionString);
+            this.context = context;
         }
 
-        public void Start()
-        {
-            var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
-            {
-                MaxConcurrentCalls = 1,
-                AutoComplete = false
-            };
-
-            queueClient.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
-
-            Console.WriteLine("Message Handler Started");
-        }
-
-        private async Task ProcessMessagesAsync(Message message, CancellationToken token)
+        public async Task Handle(SendCommunicationCommand command)
         {
             //mock long running process
             Thread.SpinWait(2000);
+            
+            var contacts = await context.Contacts.ToListAsync();
 
-            Console.WriteLine(
-                $"Received message: SequenceNumber:{message.SystemProperties.SequenceNumber} Body:{Encoding.UTF8.GetString(message.Body)}"
-            );
+            var emails = contacts.Select(x => x.Email);
 
-            var command = JsonConvert.DeserializeObject<SendCommunicationCommand>(Encoding.UTF8.GetString(message.Body));
-
-            using (var context = new CommunicationsContext(this.options))
+            foreach (var email in emails)
             {
-                var contacts = await context.Contacts.ToListAsync();
-
-                var emails = contacts.Select(x => x.Email);
-
-                foreach (var email in emails)
-                {
-                    Console.WriteLine($"Mock sending communications to {email}");
-                }
+                Console.WriteLine($"Mock sending communications to {email}");
             }
-
-            await queueClient.CompleteAsync(message.SystemProperties.LockToken);
         }
-
-        private Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
-        {
-            Console.WriteLine($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}.");
-            var context = exceptionReceivedEventArgs.ExceptionReceivedContext;
-            Console.WriteLine("Exception context for troubleshooting:");
-            Console.WriteLine($"- Endpoint: {context.Endpoint}");
-            Console.WriteLine($"- Entity Path: {context.EntityPath}");
-            Console.WriteLine($"- Executing Action: {context.Action}");
-            return Task.CompletedTask;
-        }
-
     }
 }

@@ -11,19 +11,44 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Communications.DataAccess;
 using Contacts.Messages.Notifications;
+using Communications.Backend.Handlers;
 
-namespace Communications.Backend.Handlers
+namespace Communications.Backend.Subscriptions
 {
-    public class ContactAddedHandler
+    public class ContactsSubscription
     {
         private readonly SubscriptionClient subscriptionClient;
-        private DbContextOptions<CommunicationsContext> options;
+        private readonly DbContextOptions<CommunicationsContext> options;
 
-        public ContactAddedHandler(SubscriptionClient subscriptionClient, string dbConnectionString)
+        IDictionary<Type, Action<string, CommunicationsContext>> handlers;
+
+        public ContactsSubscription(SubscriptionClient subscriptionClient, string dbConnectionString)
         {
             this.subscriptionClient = subscriptionClient;
 
             this.options = OptionsFactory.NewDbOptions<CommunicationsContext>(dbConnectionString);
+
+            this.handlers = new Dictionary<Type, Action<string, CommunicationsContext>>()
+            {
+                {
+                    typeof(ContactCreatedEventNotification),
+                    async (notificationJson, context) => {
+
+                        var notificationEvent = JsonConvert.DeserializeObject<ContactCreatedEventNotification>(notificationJson);
+                        var handler =  new ContactCreatedHandler(context);
+                        await handler.Handle(notificationEvent);
+                    }
+                },
+                {
+                     typeof(ContactRemovedEventNotification),
+                     async (notificationJson, context) => {
+
+                        var notificationEvent = JsonConvert.DeserializeObject<ContactRemovedEventNotification>(notificationJson);
+                        var handler =  new ContactRemovedHandler(context);
+                        await handler.Handle(notificationEvent);
+                    }
+                }
+            };
         }
 
         public void Start()
@@ -47,15 +72,14 @@ namespace Communications.Backend.Handlers
                 $"Received message: SequenceNumber:{message.SystemProperties.SequenceNumber} Body:{json}"
             );
 
-            var notificationEvent = JsonConvert.DeserializeObject<ContactCreatedEventNotification>(json);
+            var notification = JObject.Parse(json);
+            Type notificationType = Type.GetType(notification["Type"]?.ToString());
 
             using (var context = new CommunicationsContext(this.options))
             {
-                context.Contacts.Add(new Contact(0, notificationEvent.Email));
-
+                this.handlers[notificationType](json, context);
                 await context.SaveChangesAsync();
             }
-
             await subscriptionClient.CompleteAsync(message.SystemProperties.LockToken);
         }
 
