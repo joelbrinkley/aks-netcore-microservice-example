@@ -1,8 +1,8 @@
 using System;
 
-namespace Contacts.Messages.Notifications
+namespace Contacts.Messages.NotificationEvents
 {
-    public class ContactRemovedEventNotification
+    public class ContactRemovedEventNotification : NotificationEvent
     {
         public string Id { get; }
         public string Email { get; }

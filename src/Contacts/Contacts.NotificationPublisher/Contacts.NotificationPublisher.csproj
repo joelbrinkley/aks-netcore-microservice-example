@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Contacts.Messages\Contacts.Messages.csproj" />
     <ProjectReference Include="..\Contacts.DataAccess\Contacts.DataAccess.csproj" />
+    <ProjectReference Include="..\Contacts.Domain\Contacts.Domain.csproj" />
     <ProjectReference Include="..\..\Shared\Domain\Domain.csproj" />
   </ItemGroup>
 

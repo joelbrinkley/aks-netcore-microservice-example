@@ -21,3 +21,4 @@
     <ProjectReference Include="..\Communications.DataAccess\Communications.DataAccess.csproj" />
   </ItemGroup>
 </Project>
+

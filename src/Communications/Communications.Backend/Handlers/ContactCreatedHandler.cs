@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Communications.DataAccess;
-using Contacts.Messages.Notifications;
+using Contacts.Messages.NotificationEvents;
 
 namespace Communications.Backend.Handlers
 {

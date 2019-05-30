@@ -4,11 +4,11 @@ namespace Communications.Messages
 {
     public class SendCommunicationCommand
     {
-        public string Message { get; }
+        public string Message { get; set;}
         public DateTime CreatedOn { get; }
-        public SendCommunicationCommand(string message)
+
+        public SendCommunicationCommand()
         {
-            this.Message = message;
             this.CreatedOn = DateTime.UtcNow;
         }
     }

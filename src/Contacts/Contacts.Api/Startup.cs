@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
+using Contacts.Api.Handlers;
 using Contacts.DataAccess;
 using Contacts.Domain;
 using HealthChecks.UI.Client;
@@ -14,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Newtonsoft.Json;
 
 namespace Contacts.Api
 {
@@ -30,7 +32,7 @@ namespace Contacts.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-
+            
             var connectionstring = this.Configuration["ContactsDbSqlServerConnection"]?.ToString();
             if (string.IsNullOrEmpty(connectionstring)) throw new ConfigurationErrorsException("ContactsDbSqlServerConnection is missing.");
 
@@ -46,6 +48,9 @@ namespace Contacts.Api
                     errorNumbersToAdd: null);
                 });
             });
+
+            services.AddTransient<NewContactCommandHandler>();
+            services.AddTransient<RemoveContactCommandHandler>();
 
             services.AddHealthChecks()
                     .AddCheck("self", () => HealthCheckResult.Healthy())

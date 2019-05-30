@@ -10,8 +10,9 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Communications.DataAccess;
-using Contacts.Messages.Notifications;
+using Contacts.Messages.NotificationEvents;
 using Communications.Backend.Handlers;
+using System.Reflection;
 
 namespace Communications.Backend.Subscriptions
 {
@@ -32,20 +33,20 @@ namespace Communications.Backend.Subscriptions
             {
                 {
                     typeof(ContactCreatedEventNotification),
-                    async (notificationJson, context) => {
+                    (notificationJson, context) => {
 
                         var notificationEvent = JsonConvert.DeserializeObject<ContactCreatedEventNotification>(notificationJson);
                         var handler =  new ContactCreatedHandler(context);
-                        await handler.Handle(notificationEvent);
+                        handler.Handle(notificationEvent).Wait();
                     }
                 },
                 {
                      typeof(ContactRemovedEventNotification),
-                     async (notificationJson, context) => {
+                     (notificationJson, context) => {
 
                         var notificationEvent = JsonConvert.DeserializeObject<ContactRemovedEventNotification>(notificationJson);
                         var handler =  new ContactRemovedHandler(context);
-                        await handler.Handle(notificationEvent);
+                        handler.Handle(notificationEvent).Wait();
                     }
                 }
             };
@@ -53,6 +54,7 @@ namespace Communications.Backend.Subscriptions
 
         public void Start()
         {
+
             var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
             {
                 MaxConcurrentCalls = 1,
@@ -73,11 +75,11 @@ namespace Communications.Backend.Subscriptions
             );
 
             var notification = JObject.Parse(json);
-            Type notificationType = Type.GetType(notification["Type"]?.ToString());
+            Type notificationType = Assembly.Load("Contacts.Messages").GetType(notification["Type"]?.ToString());
 
             using (var context = new CommunicationsContext(this.options))
             {
-                this.handlers[notificationType](json, context);
+                handlers[notificationType](json, context);
                 await context.SaveChangesAsync();
             }
             await subscriptionClient.CompleteAsync(message.SystemProperties.LockToken);

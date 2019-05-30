@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Communications.Backend.Handlers;
 using Communications.Backend.Subscriptions;
+using Communications.DataAccess;
+using Microsoft.EntityFrameworkCore;
 
 namespace Communications.Backend
 {
@@ -40,6 +42,18 @@ namespace Communications.Backend
             if (string.IsNullOrEmpty(contactTopicName)) throw new ConfigurationErrorsException("ContactTopic is missing");
             if (string.IsNullOrEmpty(subscription)) throw new ConfigurationErrorsException("ContactTopicSubscription is missing");
 
+            //used for creating migrations
+            services.AddDbContext<CommunicationsContext>(options =>
+            {
+                options.UseSqlServer(communicationsdbConnectionString,
+                sqlServerOptionsAction: sqlOptions =>
+                {
+                    sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 3,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorNumbersToAdd: null);
+                });
+            });
 
             services.AddSingleton(c => new SendCommunicationSubscription(new QueueClient(serviceBusConnectionString, communicationsQueueName, ReceiveMode.PeekLock), communicationsdbConnectionString));
             services.AddSingleton(c => new ContactsSubscription(new SubscriptionClient(serviceBusConnectionString, contactTopicName, subscription, ReceiveMode.PeekLock), communicationsdbConnectionString));
@@ -49,7 +63,7 @@ namespace Communications.Backend
                 .AddAzureServiceBusQueue(
                     serviceBusConnectionString,
                     queueName: communicationsQueueName,
-                    name: "notifications-servicebus-check");
+                    name: "communications-servicebus-check");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

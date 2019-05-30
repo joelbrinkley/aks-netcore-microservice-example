@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Domain
 {
@@ -7,6 +8,8 @@ namespace Domain
     {
         private bool isTrackingEvents = true;
         protected List<IDomainEvent> domainEvents = new List<IDomainEvent>();
+        
+        [JsonIgnore]
         public IReadOnlyCollection<IDomainEvent> DomainEvents => domainEvents?.AsReadOnly();
 
         protected void TrackEvents()

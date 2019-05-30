@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Contacts.DataAccess;
 using Contacts.Domain;
 using Contacts.Domain.Events;
-using Contacts.Messages.Notifications;
+using Contacts.Messages.NotificationEvents;
 using Domain;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.EntityFrameworkCore;
@@ -50,6 +50,8 @@ namespace ContactsPublisher
         {
             TopicClient topicClient = new TopicClient(this.serviceBusConnectionString, this.topicName, RetryPolicy.Default);
 
+            Assembly domainAssembly = Assembly.Load("Contacts.Domain");
+
             using (ContactsContext dbContext = new ContactsContext(options))
             {
                 var notificationsToPublish = await dbContext.Notifications.Where(x => x.ProcessedOn == null).ToListAsync();
@@ -58,19 +60,28 @@ namespace ContactsPublisher
 
                 foreach (var notification in notificationsToPublish)
                 {
-                    notification.ProcessedOn = DateTime.UtcNow;
+                    try
+                    {
+                        notification.ProcessedOn = DateTime.UtcNow;
 
-                    Type type = Assembly.GetAssembly(typeof(IDomainEvent)).GetType(notification.Type);
+                        Type type = domainAssembly.GetType(notification.Type);
 
-                    var domainEvent = JsonConvert.DeserializeObject(notification.Data, type) as DomainEvent;
+                        var domainEvent = JsonConvert.DeserializeObject(notification.Data, type) as DomainEvent;
 
-                    var notificationEvent = this.conversionMap[type](domainEvent);
+                        var notificationEvent = this.conversionMap[type](domainEvent);
 
-                    var notificationEventJson = JsonConvert.SerializeObject(notificationEvent);
+                        var notificationEventJson = JsonConvert.SerializeObject(notificationEvent);
 
-                    var message = new Message(Encoding.UTF8.GetBytes(notificationEventJson));
+                        var message = new Message(Encoding.UTF8.GetBytes(notificationEventJson));
 
-                    await topicClient.SendAsync(message);
+                        await topicClient.SendAsync(message);
+
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                        throw;
+                    }
                 }
                 await dbContext.SaveChangesAsync();
             }

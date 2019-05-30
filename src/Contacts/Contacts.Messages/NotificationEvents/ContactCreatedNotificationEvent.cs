@@ -1,8 +1,8 @@
 using System;
 
-namespace Contacts.Messages.Notifications
+namespace Contacts.Messages.NotificationEvents
 {
-    public class ContactCreatedEventNotification
+    public class ContactCreatedEventNotification : NotificationEvent
     {
         public string Id { get; }
         public string Email { get; }
@@ -10,6 +10,7 @@ namespace Contacts.Messages.Notifications
         public ContactCreatedEventNotification(string email)
         {
             this.Id = Guid.NewGuid().ToString();
+            this.Email = email;
         }
     }
 }

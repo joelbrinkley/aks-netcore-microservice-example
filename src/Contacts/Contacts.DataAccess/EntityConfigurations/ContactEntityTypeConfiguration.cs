@@ -14,6 +14,7 @@ namespace Contacts.DataAccess
 
             builder.Property(x => x.FirstName).IsRequired().HasMaxLength(200);
             builder.Property(x => x.LastName).IsRequired().HasMaxLength(200);
+            builder.Ignore(x=>x.DomainEvents);
         }
     }
 }

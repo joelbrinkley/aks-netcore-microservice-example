@@ -104,11 +104,11 @@ resource "random_integer" "main" {
 }
 
 resource "azurerm_sql_server" "main" {
-  name                         = "${var.prefix}-sql"
+  name                         = "${substr(var.prefix, 0, min(length(var.prefix), 7))}-sql"
   resource_group_name          = "${azurerm_resource_group.main.name}"
   location                     = "${azurerm_resource_group.main.location}"
   version                      = "12.0"
-  administrator_login          = "notifydb-admin"
+  administrator_login          = "commdb-admin"
   administrator_login_password = "${var.sql_password}"
   tags                         = "${local.tags}"
 }
@@ -137,6 +137,15 @@ resource "azurerm_sql_firewall_rule" "allow_all_azure_ips" {
   server_name         = "${azurerm_sql_server.main.name}"
   start_ip_address    = "0.0.0.0"
   end_ip_address      = "0.0.0.0"
+}
+
+resource "azurerm_sql_firewall_rule" "sql_allow_ips" {
+  count               = "${length(var.sql_allowed_ips)}"
+  name                = "Sql_Allow_Ips_${count.index}"
+  resource_group_name = "${azurerm_resource_group.main.name}"
+  server_name         = "${azurerm_sql_server.main.name}"
+  start_ip_address    = "${var.sql_allowed_ips[count.index]}"
+  end_ip_address      = "${var.sql_allowed_ips[count.index]}"
 }
 
 resource "azurerm_container_registry" "main" {
@@ -181,44 +190,6 @@ resource "azurerm_key_vault" "main" {
     ]
   }
 
-  access_policy {
-    tenant_id = "${var.tenant_id}"
-    object_id = "${var.key_vault_admin}"
-
-    key_permissions = [
-      "get",
-      "list",
-      "update",
-      "create",
-      "import",
-      "delete",
-      "recover",
-      "backup",
-      "restore",
-    ]
-
-    secret_permissions = [
-      "get",
-      "list",
-      "delete",
-      "recover",
-      "backup",
-      "restore",
-      "set",
-    ]
-
-    storage_permissions = [
-      "get",
-      "set",
-      "list",
-      "update",
-      "delete",
-      "recover",
-      "backup",
-      "restore",
-    ]
-  }
-
   tags = "${local.tags}"
 }
 
@@ -231,7 +202,7 @@ resource "azurerm_key_vault_secret" "contactsdb_sql_server_connection" {
 }
 
 resource "azurerm_key_vault_secret" "communicationsdb_sql_server_connection" {
-  name         = "communicationsDbSqlServerConnection"
+  name         = "CommunicationsDbSqlServerConnection"
   value        = "Server=tcp:${azurerm_sql_server.main.fully_qualified_domain_name},1433; Database=${azurerm_sql_database.communicationsdb.name};User ID=${azurerm_sql_server.main.administrator_login};Password=${azurerm_sql_server.main.administrator_login_password};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
   key_vault_id = "${azurerm_key_vault.main.id}"
 

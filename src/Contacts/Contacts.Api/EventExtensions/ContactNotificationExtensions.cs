@@ -1,7 +1,7 @@
 using System;
 using Contacts.DataAccess;
 using Contacts.Domain.Events;
-using Contacts.Messages.Notifications;
+using Contacts.Messages.NotificationEvents;
 using Domain;
 using Newtonsoft.Json;
 
