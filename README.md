@@ -1,4 +1,4 @@
-#Overview
+# Overview
 The purpose of this project is to create an example project to explore ideas using .Net Core, Microservices, and AKS.
 
 Please note that this cloud infrastructure will incur Azure costs.
@@ -16,7 +16,7 @@ Create a terraform.tfvars file in the cloud-infrastructure directory.
 
 Provide variable values in the file
 
-`
+```
 // your apps name
 prefix = "
 
@@ -43,15 +43,17 @@ agent_count = 2
 
 // A list of allowed IPs for Azure Sql Server, put your IP here
 sql_allowed_ips = ["154.64.112.433"]
-`
+```
 
 ### Execute Terraform
 
-`
+```
 cd cloud-infrastructure
+
 terraform init
+
 terraform apply
-`
+```
 
 type 'yes' when prompted to deploy
 
@@ -71,17 +73,20 @@ This step is dependent on ensuring that your IP is allowed in Azure Sql Server a
 ### Contacts
 Navigate to Contacts.Api and use the cli to update the database
 
-`
+```
 cd Contacts/Contacts.Api
+
 dotnet ef database update
-`
+```
 
 ### Communications
 Navigate to Communications.Backend and use the cli to update the database
-`
+
+```
 cd Communications/Communications.Backend
+
 dotnet ef database update
-`
+```
 
 
 
