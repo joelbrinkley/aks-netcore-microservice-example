@@ -11,7 +11,7 @@ resource "kubernetes_deployment" "communications_processing_service" {
       name       = "${local.communications_processor_name}"
       version    = "${local.communications_processor_version}"
       component  = "service"
-      part-of    = "communicationsapp"
+      part-of    = "communications-app"
       managed-by = "terraform"
     }
   }
@@ -41,8 +41,8 @@ resource "kubernetes_deployment" "communications_processing_service" {
 
         container {
           image_pull_policy = "Always"
-          image             = "${data.terraform_remote_state.infra.acr_server}/communicationsapp-CommunicationsProcessor:${local.communications_processor_version}"
-          name              = "communicationsapp-communications-processing-service"
+          image             = "${data.terraform_remote_state.infra.acr_server}/communications-app_communications-backend:${local.communications_processor_version}"
+          name              = "communications-app_communications-backend"
 
           readiness_probe {
             http_get {

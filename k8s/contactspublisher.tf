@@ -1,5 +1,5 @@
 locals {
-  contact_publisher_name    = "contact-publisher"
+  contact_publisher_name    = "contacts-notificationpublisher"
   contact_publisher_version = "v1"
 }
 
@@ -41,8 +41,8 @@ resource "kubernetes_deployment" "contact_publisher" {
 
         container {
           image_pull_policy = "Always"
-          image             = "${data.terraform_remote_state.infra.acr_server}/notifyapp-contactspublisher:${local.contact_publisher_version}"
-          name              = "notifyapp-contacts-publisher"
+          image             = "${data.terraform_remote_state.infra.acr_server}/communications-app_contacts-notificationpublisher:${local.contact_publisher_version}"
+          name              = "communications-app_contacts-notificationpublisher"
 
           liveness_probe {
             http_get {

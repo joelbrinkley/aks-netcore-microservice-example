@@ -1,9 +1,9 @@
 locals {
-  contact_api_name = "contact-api"
+  contact_api_name = "contacts-api"
   contact_api_version  = "v1"
 }
 
-resource "kubernetes_deployment" "contact_api" {
+resource "kubernetes_deployment" "contacts_api" {
   metadata {
     name = "${local.contact_api_name}-deployment"
 
@@ -11,7 +11,7 @@ resource "kubernetes_deployment" "contact_api" {
       name       = "${local.contact_api_name}"
       version    = "${local.contact_api_version}"
       component  = "api"
-      part-of    = "communicationsapp"
+      part-of    = "communications-app"
       managed-by = "terraform"
     }
   }
@@ -41,8 +41,8 @@ resource "kubernetes_deployment" "contact_api" {
 
         container {
           image_pull_policy = "Always"
-          image = "${data.terraform_remote_state.infra.acr_server}/communicationsapp-contactsapi:${local.contact_api_version}"
-          name  = "communicationsapp-contact-api"
+          image = "${data.terraform_remote_state.infra.acr_server}/communications-app_contacts-api:${local.contact_api_version}"
+          name  = "communications-app_contacts-api"
 
           liveness_probe {
             http_get {
@@ -84,7 +84,7 @@ resource "kubernetes_deployment" "contact_api" {
   }
 }
 
-resource "kubernetes_service" "contact_api" {
+resource "kubernetes_service" "contacts_api" {
   metadata {
     name = "${local.contact_api_name}-service"
   }

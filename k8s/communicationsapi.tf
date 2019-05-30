@@ -11,7 +11,7 @@ resource "kubernetes_deployment" "communications_api" {
       name       = "${local.communications_api_name}"
       version    = "${local.communications_api_version}"
       component  = "api"
-      part-of    = "communicationsapp"
+      part-of    = "communications-app"
       managed-by = "terraform"
     }
   }
@@ -41,8 +41,8 @@ resource "kubernetes_deployment" "communications_api" {
 
         container {
           image_pull_policy = "Always"
-          image             = "${data.terraform_remote_state.infra.acr_server}/communicationsapp-communicationsapi:${local.communications_api_version}"
-          name              = "communicationsapp-communications-api"
+          image             = "${data.terraform_remote_state.infra.acr_server}/communications-app_communications-api:${local.communications_api_version}"
+          name              = "communications-app_communications-api"
 
           liveness_probe {
             http_get {
