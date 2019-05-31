@@ -12,42 +12,42 @@
             "problemMatcher": "$tsc"
         },
         {
-            "label": "build-contactsservice",
+            "label": "build-contactsapi",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/ContactsService/ContactsService.csproj"
+                "${workspaceFolder}/src/Contacts/Contacts.Api/Contacts.Api.csproj"
             ],
             "problemMatcher": "$tsc"
         },
         {
-            "label": "build-contactspublisher",
+            "label": "build-contactsnotificationpublisher",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/ContactsPublisher/ContactsPublisher.csproj"
+                "${workspaceFolder}/src/Contacts/Contacts.NotificationPublisher/Contacts.NotificationPublisher.csproj"
             ],
             "problemMatcher": "$tsc"
         },
         {
-            "label": "build-notificationprocessingservice",
+            "label": "build-communicationsapi",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/NotificationProcessingService/NotificationProcessingService.csproj"
+                "${workspaceFolder}/src/Communications/Communications.Api/Communications.Api.csproj"
             ],
             "problemMatcher": "$tsc"
         },
         {
-            "label": "build-notificationservice",
+            "label": "build-communicationsbackend",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/NotificationService/NotificationService.csproj"
+                "${workspaceFolder}/src/Communications/Communications.Backend/Communications.Backend.csproj"
             ],
             "problemMatcher": "$tsc"
         }      

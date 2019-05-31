@@ -1,22 +1,19 @@
 param(    
+    [string]$acr = "",
     [string]$version = "v1"
 )
 
-docker-compose build
+docker build -f ./src/Frontend/dockerfile . -t "$acr.azurecr.io/communications-app_frontend:$version"
+docker push "$acr.azurecr.io/communications-app_frontend:$version"
 
-docker tag notificationapp_notifyapp-frontend acr65099.azurecr.io/notifyapp-frontend:$version
-Write-Output "docker tag notificationapp_notifyapp-frontend acr65099.azurecr.io/notifyapp-frontend:$version"
-docker tag notificationapp_notification-processing-service acr65099.azurecr.io/notifyapp-notificationprocessingservice:$version
-Write-Output "docker tag notificationapp_notification-processing-service acr65099.azurecr.io/notifyapp-notificationprocessingservice:$version"
-docker tag notificationapp_notification-service acr65099.azurecr.io/notifyapp-notificationservice:$version
-Write-Output "docker tag notificationapp_notification-service acr65099.azurecr.io/notifyapp-notificationservice:$version"
-docker tag notificationapp_contacts-publisher acr65099.azurecr.io/notifyapp-contactspublisher:$version
-Write-Output "docker tag notificationapp_contacts-publisher acr65099.azurecr.io/notifyapp-contactspublisher:$version"
-docker tag notificationapp_contacts-service acr65099.azurecr.io/notifyapp-contactsservice:$version
-Write-Output "docker tag notificationapp_contacts-service acr65099.azurecr.io/notifyapp-contactsservice:$version"
+docker build -f ./src/Contacts/Contacts.Api/dockerfile . -t "$acr.azurecr.io/communications-app_contacts-api:$version"
+docker push "$acr.azurecr.io/communications-app_contacts-api:$version"
 
-docker push acr65099.azurecr.io/notifyapp-frontend:$version
-docker push acr65099.azurecr.io/notifyapp-notificationprocessingservice:$version
-docker push acr65099.azurecr.io/notifyapp-notificationservice:$version
-docker push acr65099.azurecr.io/notifyapp-contactspublisher:$version
-docker push acr65099.azurecr.io/notifyapp-contactsservice:$version
+docker build -f ./src/Contacts/Contacts.NotificationHandler/dockerfile . -t "$acr.azurecr.io/communications-app_contacts-notificationpublisher:$version"
+docker push "$acr.azurecr.io/communications-app_contacts-notificationpublisher:$version"
+
+docker build -f ./src/Communications/Communications.Api/dockerfile . -t "$acr.azurecr.io/communications-app_communications-api:$version"
+docker push "$acr.azurecr.io/communications-app_communications-api:$version"
+
+docker build -f ./src/Communications/Communications.Backend/dockerfile . -t "$acr.azurecr.io/communications-app_communications-backend:$version"
+docker push "$acr.azurecr.io/communications-app_communications-backend:$version"

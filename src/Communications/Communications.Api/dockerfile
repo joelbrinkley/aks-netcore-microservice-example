@@ -1,0 +1,27 @@
+FROM microsoft/dotnet:sdk AS build-env
+
+# Copy csproj and restore as distinct layers
+WORKDIR /src
+
+COPY /src/Communications/Communications.Messages/Communications.Messages.csproj /src/Communications/Communications.Messages/
+COPY /src/Communications/Communications.DataAccess/Communications.DataAccess.csproj  /src/Communications/Communications.DataAccess/
+
+WORKDIR /src/Communications/Communications.Api
+COPY /src/Communications/Communications.Api/Communications.Api.csproj .
+RUN dotnet restore
+
+
+# Copy everything else and build
+COPY /src/Communications/Communications.Messages/ /src/Communications/Communications.Messages/
+COPY /src/Communications/Communications.DataAccess/ /src/Communications/Communications.DataAccess/
+COPY /src/Communications/Communications.Api/ /src/Communications/Communications.Api/
+
+WORKDIR /src/Communications/Communications.Api
+
+RUN dotnet publish -c Release -o /out
+
+# Build runtime image
+FROM microsoft/dotnet:aspnetcore-runtime
+WORKDIR /app
+COPY --from=build-env /out .
+ENTRYPOINT ["dotnet", "Communications.Api.dll"]

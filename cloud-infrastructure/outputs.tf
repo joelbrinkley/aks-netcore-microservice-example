@@ -1,8 +1,8 @@
-output "notify_app_client_id" {
+output "communications_app_client_id" {
   value = "${azuread_application.main.application_id}"
 }
 
-output "notify_app_client_secret" {
+output "communications_app_client_secret" {
   sensitive = true
   value     = "${azuread_service_principal_password.main.value}"
 }

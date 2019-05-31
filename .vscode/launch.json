@@ -5,13 +5,13 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Contact Service",
+      "name": "Launch Contact Api",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "build-contactsservice",
-      "program": "${workspaceFolder}/src/ContactsService/bin/Debug/netcoreapp2.2/ContactsService.dll",
+      "preLaunchTask": "build-contactsapi",
+      "program": "${workspaceFolder}/src/Contacts/Contacts.Api/bin/Debug/netcoreapp2.2/Contacts.Api.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/src/ContactsService",
+      "cwd": "${workspaceFolder}/src/Contacts/Contacts.Api/",
       "stopAtEntry": false,
       "launchBrowser": {
         "enabled": true
@@ -21,13 +21,13 @@
       }
     },
     {
-      "name": "Launch Notification Service",
+      "name": "Launch Communications Api",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "build-notificationservice",
-      "program": "${workspaceFolder}/src/NotificationService/bin/Debug/netcoreapp2.2/NotificationService.dll",
+      "preLaunchTask": "build-communicationsapi",
+      "program": "${workspaceFolder}/src/Communications/Communications.Api/bin/Debug/netcoreapp2.2/Communications.Api.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/src/NotificationService",
+      "cwd": "${workspaceFolder}/src/Communications/Communications.Api",
       "stopAtEntry": false,
       "console": "internalConsole",
       "launchBrowser": {
@@ -38,13 +38,13 @@
       }
     }, 
     {
-      "name": "Launch Contacts Publisher",
+      "name": "Launch Contacts Notification Publisher",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "build-contactspublisher",
-      "program": "${workspaceFolder}/src/ContactsPublisher/bin/Debug/netcoreapp2.2/ContactsPublisher.dll",
+      "preLaunchTask": "build-contactsnotificationpublisher",
+      "program": "${workspaceFolder}/src/Contacts/Contacts.NotificationPublisher/bin/Debug/netcoreapp2.2/Contacts.NotificationPublisher.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/src/ContactsPublisher",
+      "cwd": "${workspaceFolder}/src/Contacts/Contacts.NotificationPublisher",
       "stopAtEntry": false,
       "console": "internalConsole",
       "launchBrowser": {
@@ -55,13 +55,13 @@
       }
     }, 
     {
-      "name": "Launch NotificationProcessingService",
+      "name": "Launch Communications Backend",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "build-notificationprocessingservice",
-      "program": "${workspaceFolder}/src/NotificationProcessingService/bin/Debug/netcoreapp2.2/NotificationProcessingService.dll",
+      "preLaunchTask": "build-communicationsbackend",
+      "program": "${workspaceFolder}/src/Communications/Communications.Backend/bin/Debug/netcoreapp2.2/Communications.Backend.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/src/NotificationProcessingService",
+      "cwd": "${workspaceFolder}/src/Communications/Communications.Backend",
       "stopAtEntry": false,
       "console": "internalConsole",
       "launchBrowser": {

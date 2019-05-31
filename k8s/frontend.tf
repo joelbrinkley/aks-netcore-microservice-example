@@ -11,7 +11,7 @@ resource "kubernetes_deployment" "frontend" {
       name       = "${local.frontend_name}"
       version    = "${local.frontend_version}"
       component  = "frontend"
-      part-of    = "notifyapp"
+      part-of    = "communications-app"
       managed-by = "terraform"
     }
   }
@@ -41,8 +41,8 @@ resource "kubernetes_deployment" "frontend" {
 
         container {
           image_pull_policy = "Always"
-          image             = "${data.terraform_remote_state.infra.acr_server}/notifyapp-frontend:${local.frontend_version}"
-          name              = "notifyapp-frontend-service"
+          image             = "${data.terraform_remote_state.infra.acr_server}/communications-app_frontend:${local.frontend_version}"
+          name              = "communications-app_frontend"
 
           liveness_probe {
             http_get {
@@ -75,12 +75,12 @@ resource "kubernetes_deployment" "frontend" {
 
           env {
             name  = "ServiceEndpoints__ContactsService"
-            value = "http://contact-svc-service:8080"
+            value = "http://contact-api-service:8080"
           }
 
           env {
-            name  = "ServiceEndpoints__NotificationService"
-            value = "http://notification-svc-service:8080"
+            name  = "ServiceEndpoints__CommunicationsService"
+            value = "http://communications-api-service:8080"
           }
         }
       }

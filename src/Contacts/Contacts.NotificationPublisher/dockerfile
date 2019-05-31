@@ -1,0 +1,31 @@
+FROM microsoft/dotnet:sdk AS build-env
+
+# Copy csproj and restore as distinct layers
+WORKDIR /src
+
+COPY /src/Shared/Domain/Domain.csproj /src/Shared/Domain/
+COPY /src/Contacts/Contacts.Domain/Contacts.Domain.csproj /src/Contacts/Contacts.Domain/
+COPY /src/Contacts/Contacts.Messages/Contacts.Messages.csproj /src/Contacts/Contacts.Messages/
+COPY /src/Contacts/Contacts.DataAccess/Contacts.DataAccess.csproj  /src/Contacts/Contacts.DataAccess/
+
+WORKDIR /src/Contacts/Contacts.NotificationPublisher
+COPY /src/Contacts/Contacts.NotificationPublisher/Contacts.NotificationPublisher.csproj .
+RUN dotnet restore
+
+
+# Copy everything else and build
+COPY /src/Shared/Domain/ /src/Shared/Domain/
+COPY /src/Contacts/Contacts.Messages/ /src/Contacts/Contacts.Messages/
+COPY /src/Contacts/Contacts.DataAccess/ /src/Contacts/Contacts.DataAccess/
+COPY /src/Contacts/Contacts.Domain/ /src/Contacts/Contacts.Domain/
+COPY /src/Contacts/Contacts.NotificationPublisher/ /src/Contacts/Contacts.NotificationPublisher/
+
+WORKDIR /src/Contacts/Contacts.NotificationPublisher
+
+RUN dotnet publish -c Release -o /out
+
+# Build runtime image
+FROM microsoft/dotnet:aspnetcore-runtime
+WORKDIR /app
+COPY --from=build-env /out .
+ENTRYPOINT ["dotnet", "Contacts.NotificationPublisher.dll"]

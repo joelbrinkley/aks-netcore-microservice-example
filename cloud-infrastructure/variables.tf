@@ -1,6 +1,6 @@
 variable "prefix" {
   type    = "string"
-  default = "notification-app"
+  default = "communications-app"
 }
 
 variable "location" {
@@ -38,7 +38,6 @@ variable "sql_password" {
 variable "service_principal_pw" {}
 variable "tenant_id" {}
 
-variable "key_vault_admin" {
-  
+variable "sql_allowed_ips" {
+  type = "list"
 }
-

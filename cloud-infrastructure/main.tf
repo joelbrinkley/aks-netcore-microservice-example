@@ -3,7 +3,7 @@ locals {
     owner   = "Joel Brinkley"
     creator = "Joel Brinkley"
     source  = "Terraform"
-    app     = "notificationapp"
+    app     = "communications-app"
   }
 }
 
@@ -75,7 +75,7 @@ resource "azurerm_servicebus_namespace" "main" {
 }
 
 resource "azurerm_servicebus_queue" "main" {
-  name                = "notifications"
+  name                = "communications"
   resource_group_name = "${azurerm_resource_group.main.name}"
   namespace_name      = "${azurerm_servicebus_namespace.main.name}"
 
@@ -90,8 +90,8 @@ resource "azurerm_servicebus_topic" "contacts_topic" {
   enable_partitioning = false
 }
 
-resource "azurerm_servicebus_subscription" "notification_processing_contacts_subscription" {
-  name                = "notification-processing-contact-subscription"
+resource "azurerm_servicebus_subscription" "communication_backend_contacts_subscription" {
+  name                = "communication-backend-contact-subscription"
   resource_group_name = "${azurerm_resource_group.main.name}"
   namespace_name      = "${azurerm_servicebus_namespace.main.name}"
   topic_name          = "${azurerm_servicebus_topic.contacts_topic.name}"
@@ -104,11 +104,11 @@ resource "random_integer" "main" {
 }
 
 resource "azurerm_sql_server" "main" {
-  name                         = "${var.prefix}-sql"
+  name                         = "${substr(var.prefix, 0, min(length(var.prefix), 7))}-sql"
   resource_group_name          = "${azurerm_resource_group.main.name}"
   location                     = "${azurerm_resource_group.main.location}"
   version                      = "12.0"
-  administrator_login          = "notifydb-admin"
+  administrator_login          = "commdb-admin"
   administrator_login_password = "${var.sql_password}"
   tags                         = "${local.tags}"
 }
@@ -122,8 +122,8 @@ resource "azurerm_sql_database" "contactsdb" {
   tags                = "${local.tags}"
 }
 
-resource "azurerm_sql_database" "notificationsdb" {
-  name                = "notificationsdb"
+resource "azurerm_sql_database" "communicationsdb" {
+  name                = "communicationsdb"
   resource_group_name = "${azurerm_resource_group.main.name}"
   location            = "${azurerm_resource_group.main.location}"
   server_name         = "${azurerm_sql_server.main.name}"
@@ -137,6 +137,15 @@ resource "azurerm_sql_firewall_rule" "allow_all_azure_ips" {
   server_name         = "${azurerm_sql_server.main.name}"
   start_ip_address    = "0.0.0.0"
   end_ip_address      = "0.0.0.0"
+}
+
+resource "azurerm_sql_firewall_rule" "sql_allow_ips" {
+  count               = "${length(var.sql_allowed_ips)}"
+  name                = "Sql_Allow_Ips_${count.index}"
+  resource_group_name = "${azurerm_resource_group.main.name}"
+  server_name         = "${azurerm_sql_server.main.name}"
+  start_ip_address    = "${var.sql_allowed_ips[count.index]}"
+  end_ip_address      = "${var.sql_allowed_ips[count.index]}"
 }
 
 resource "azurerm_container_registry" "main" {
@@ -181,44 +190,6 @@ resource "azurerm_key_vault" "main" {
     ]
   }
 
-  access_policy {
-    tenant_id = "${var.tenant_id}"
-    object_id = "${var.key_vault_admin}"
-
-    key_permissions = [
-      "get",
-      "list",
-      "update",
-      "create",
-      "import",
-      "delete",
-      "recover",
-      "backup",
-      "restore",
-    ]
-
-    secret_permissions = [
-      "get",
-      "list",
-      "delete",
-      "recover",
-      "backup",
-      "restore",
-      "set",
-    ]
-
-    storage_permissions = [
-      "get",
-      "set",
-      "list",
-      "update",
-      "delete",
-      "recover",
-      "backup",
-      "restore",
-    ]
-  }
-
   tags = "${local.tags}"
 }
 
@@ -230,15 +201,15 @@ resource "azurerm_key_vault_secret" "contactsdb_sql_server_connection" {
   tags = "${local.tags}"
 }
 
-resource "azurerm_key_vault_secret" "notificationsdb_sql_server_connection" {
-  name         = "NotificationsDbSqlServerConnection"
-  value        = "Server=tcp:${azurerm_sql_server.main.fully_qualified_domain_name},1433; Database=${azurerm_sql_database.notificationsdb.name};User ID=${azurerm_sql_server.main.administrator_login};Password=${azurerm_sql_server.main.administrator_login_password};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+resource "azurerm_key_vault_secret" "communicationsdb_sql_server_connection" {
+  name         = "CommunicationsDbSqlServerConnection"
+  value        = "Server=tcp:${azurerm_sql_server.main.fully_qualified_domain_name},1433; Database=${azurerm_sql_database.communicationsdb.name};User ID=${azurerm_sql_server.main.administrator_login};Password=${azurerm_sql_server.main.administrator_login_password};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
   key_vault_id = "${azurerm_key_vault.main.id}"
 
   tags = "${local.tags}"
 }
 
-resource "azurerm_key_vault_secret" "notification_connection_string" {
+resource "azurerm_key_vault_secret" "communication_connection_string" {
   name         = "ServiceBusConnectionString"
   value        = "${azurerm_servicebus_namespace.main.default_primary_connection_string}"
   key_vault_id = "${azurerm_key_vault.main.id}"
