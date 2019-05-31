@@ -102,7 +102,7 @@ az acr login -n MyRegistry
 Use the Powershell Scripts build-tag-all.ps1 to build and tag images in Azure Container Registry
 
 ```
-// subsitute acr78890 with your azure container registry name
+// substitute acr78890 with your azure container registry name
 ./build-tag-all.ps1 -version v1 -acr acr78890
 ```
 
